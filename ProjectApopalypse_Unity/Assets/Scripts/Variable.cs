@@ -3,35 +3,34 @@ using UnityEngine;
 
 public class Variable : MonoBehaviour
 {
-    public int variable;
+    public int integer;
 
     bool isLocked;
-    int minVar = 0;
-    int maxVar = 999;
+    int minInt = 0;
+    int maxInt = 999;
 
-    public int Variable
+    public int Integer
     {
         get
         {
-            return variable;
+            return integer;
         }
         set
         {
             if (isLocked)
             {
                 Debug.Log("This variable is locked.");
-                return variable;
             }
             else
             {
-                variable = value;
-                if (variable > maxVar)
+                integer = value;
+                if (integer > maxInt)
                 {
-                    variable = maxVar;
+                    integer = maxInt;
                 }
-                else if (variable < minVar)
+                else if (integer < minInt)
                 {
-                    variable = minVar;
+                    integer = minInt;
                 }
             }
         }

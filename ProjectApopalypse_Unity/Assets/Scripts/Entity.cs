@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
+using UnityEngine.UI;
 
 public class Entity : MonoBehaviour
 {
@@ -35,10 +35,14 @@ public class Entity : MonoBehaviour
     //Stage.Theme theme;
 
     Animator animator;
-    Renderer renderer;
-    Texture variation;
+    Renderer render;
+
+    public string variationName;
+    public Texture variation;
 
     void Start()
     {
+        animator = GetComponent<Animator>();
+        render = GetComponent<Renderer>();
     }
 }
