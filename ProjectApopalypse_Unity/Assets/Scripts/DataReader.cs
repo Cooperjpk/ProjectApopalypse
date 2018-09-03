@@ -11,19 +11,44 @@ public class DataReader : MonoBehaviour
     //Each of files are ran for each row that's in them. All public instances are created.
 
     public string[] assetPaths;
+    string[] keyString;
+    public List<string[]> instanceStrings = new List<string[]>();
 
     void Awake()
     {
         string path = Application.streamingAssetsPath + "/StreamingAssets.txt";
         assetPaths = File.ReadAllLines(path);
 
-        foreach(string assetPath in assetPaths)
+        foreach (string assetPath in assetPaths)
         {
-            Debug.Log(assetPath);
-            string filePath = Application.streamingAssetsPath + "/" + assetPath + ".txt";
-            string[] filePaths = File.ReadAllLines(filePath);
+            //Debug.Log(assetPath);
+            string[] fileText = File.ReadAllLines(Application.streamingAssetsPath + "/" + assetPath + ".txt");
 
-            //https://answers.unity.com/questions/1354236/ioexception-sharing-violation-on-path-trying-to-sa.html
+            //First split up the first line by tabs so you have your key for all other lines.
+            keyString = fileText[0].Split('\t');
+
+            //Now for each line after the first, break it up and add it to the list of string arrays.
+            for (int i = 1; i < fileText.Length; i++)
+            {
+                string[] lineValues = fileText[i].Split('\t');
+                instanceStrings.Add(lineValues);
+            }
         }
+        /*
+        foreach (string[] stringthings in instanceStrings)
+        {
+            foreach (string stringthing in stringthings)
+            {
+                Debug.Log(stringthing);
+            }
+        }
+        */
+    }
+
+    void CreateInstances()
+    {
+        //Create an instance of the name of the text file = which should be a preexisitng class
+        //Use the key string to determine what variable to affect and then use the string to determine the value.
+        //Create all the instances and ur done!
     }
 }

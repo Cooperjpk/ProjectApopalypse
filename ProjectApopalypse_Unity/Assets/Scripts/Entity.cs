@@ -23,14 +23,15 @@ public class Entity : MonoBehaviour
         }
     }
 
-    public enum Rarity
+    public enum Rank
     {
-        Common,
-        Rare,
-        Epic,
-        Legendary
+        S,
+        A,
+        B,
+        C,
+        D
     }
-    Rarity rarity;
+    public Rank rank;
 
     //Stage.Theme theme;
 
@@ -40,9 +41,101 @@ public class Entity : MonoBehaviour
     public string variationName;
     public Texture variation;
 
+    //Health
+    int curHealth;
+    public Variable totHealth;
+    int actHealth;
+
+    int curBaseArmor;
+    public Variable totBaseArmor;
+    int actBaseArmor;
+
+    int curTroopArmor;
+    public Variable totTroopArmor;
+    int actTroopArmor;
+
+    int curStructureArmor;
+    public Variable totStructureArmor;
+    int actStructureArmor;
+
+    int curDirectArmor;
+    public Variable totDirectArmor;
+    int actDirectArmor;
+
+    int curSplashArmor;
+    public Variable totSplashArmor;
+    int actSplashArmor;
+
+    public bool isAlive;
+    public bool isInvincible;
+
+    public enum DamageType
+    {
+        Direct,
+        Splash
+    }
+
+    public enum DamageSource
+    {
+        Troop,
+        Structure
+    }
+
+    int damageFraction = 0;
+
     void Start()
     {
         animator = GetComponent<Animator>();
         render = GetComponent<Renderer>();
     }
+
+    public void ChangeHealth(int damage, DamageType damageType, DamageSource damageSource)
+    {
+        switch (damageType)
+        {
+            case DamageType.Direct:
+                {
+                    damageFraction += curDirectArmor;
+                    break;
+                }
+            case DamageType.Splash:
+                {
+                    damageFraction += curSplashArmor;
+                    break;
+                }
+        }
+
+        switch (damageSource)
+        {
+            case DamageSource.Troop:
+                {
+                    damageFraction += curTroopArmor;
+                    break;
+                }
+            case DamageSource.Structure:
+                {
+                    damageFraction += curStructureArmor;
+                    break;
+                }
+        }
+
+        float damageMultiplier = damage / (damage + damageFraction + curBaseArmor);
+        float finalDamage = damage * damageMultiplier;
+        curHealth -= Mathf.RoundToInt(finalDamage);
+
+        if(curHealth <= 0)
+        {
+            curHealth = 0;
+            isAlive = false;
+            //Death happens here.
+        }
+        else if(curHealth >= totHealth.integer)
+        {
+            curHealth = totHealth.integer;
+        }
+
+        damageFraction = 0;
+    }
+
+
 }
