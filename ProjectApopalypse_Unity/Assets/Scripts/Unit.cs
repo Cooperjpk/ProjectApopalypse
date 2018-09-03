@@ -27,47 +27,47 @@ public class Unit : Entity {
 
     int curBaseDamage;
     public Variable totBaseDamage;
-    int actBaseDamage;
+    public int actBaseDamage;
 
     int curTroopDamage;
     public Variable totTroopDamage;
-    int actTroopDamage;
+    public int actTroopDamage;
 
     int curCoreDamage;
     public Variable totCoreDamage;
-    int actCoreDamage;
+    public int actCoreDamage;
 
     int curChestDamage;
     public Variable totChestDamage;
-    int actChestDamage;
+    public int actChestDamage;
 
     int curDirectDamage;
     public Variable totDirectDamage;
-    int actDirectDamage;
+    public int actDirectDamage;
 
     int curSplashDamage;
     public Variable totSplashDamage;
-    int actSplashDamage;
+    public int actSplashDamage;
 
     int curCooldown;
     public Variable totCooldown;
-    int actCooldown;
+    public int actCooldown;
 
     int curChargeTime;
     public Variable totChargeTime;
-    int actChargeTime;
+    public int actChargeTime;
 
     int curSplashRadius;
     public Variable totSplashRadius;
-    int actSplashRadius;
+    public int actSplashRadius;
 
     int curRange;
     public Variable totRange;
-    int actRange;
+    public int actRange;
 
     int curMoveSpeed;
     public Variable totMoveSpeed;
-    int actMoveSpeed;
+    public int actMoveSpeed;
 
     public enum MoveType
     {

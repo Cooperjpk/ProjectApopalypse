@@ -44,27 +44,27 @@ public class Entity : MonoBehaviour
     //Health
     int curHealth;
     public Variable totHealth;
-    int actHealth;
+    public int actHealth;
 
     int curBaseArmor;
     public Variable totBaseArmor;
-    int actBaseArmor;
+    public int actBaseArmor;
 
     int curTroopArmor;
     public Variable totTroopArmor;
-    int actTroopArmor;
+    public int actTroopArmor;
 
     int curStructureArmor;
     public Variable totStructureArmor;
-    int actStructureArmor;
+    public int actStructureArmor;
 
     int curDirectArmor;
     public Variable totDirectArmor;
-    int actDirectArmor;
+    public int actDirectArmor;
 
     int curSplashArmor;
     public Variable totSplashArmor;
-    int actSplashArmor;
+    public int actSplashArmor;
 
     public bool isAlive;
     public bool isInvincible;

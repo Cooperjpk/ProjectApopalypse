@@ -45,7 +45,7 @@ public class DataReader : MonoBehaviour
         */
     }
 
-    void CreateInstances()
+    public void CreateInstance(string textFile,string technicalName)
     {
         //Create an instance of the name of the text file = which should be a preexisitng class
         //Use the key string to determine what variable to affect and then use the string to determine the value.
