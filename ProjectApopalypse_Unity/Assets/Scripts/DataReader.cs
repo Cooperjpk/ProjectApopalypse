@@ -12,7 +12,9 @@ public class DataReader : MonoBehaviour
 
     public string[] assetPaths;
     string[] keyString;
-    public List<string[]> instanceStrings = new List<string[]>();
+    List<string[]> instanceStrings = new List<string[]>();
+
+    public List<string[]> units = new List<string[]>();
 
     void Awake()
     {
@@ -24,31 +26,54 @@ public class DataReader : MonoBehaviour
             //Debug.Log(assetPath);
             string[] fileText = File.ReadAllLines(Application.streamingAssetsPath + "/" + assetPath + ".txt");
 
-            //First split up the first line by tabs so you have your key for all other lines.
-            keyString = fileText[0].Split('\t');
-
-            //Now for each line after the first, break it up and add it to the list of string arrays.
-            for (int i = 1; i < fileText.Length; i++)
+            for (int i = 0; i < fileText.Length; i++)
             {
                 string[] lineValues = fileText[i].Split('\t');
                 instanceStrings.Add(lineValues);
             }
-        }
-        /*
-        foreach (string[] stringthings in instanceStrings)
-        {
-            foreach (string stringthing in stringthings)
+
+            switch (assetPath)
             {
-                Debug.Log(stringthing);
+                case "Unit":
+                    {
+                        units = instanceStrings;
+                        break;
+                    }
             }
+
+            instanceStrings.Clear();
         }
-        */
     }
 
-    public void CreateInstance(string textFile,string technicalName)
+    void CreateInstance(string assetName,string technicalName)
     {
         //Create an instance of the name of the text file = which should be a preexisitng class
         //Use the key string to determine what variable to affect and then use the string to determine the value.
         //Create all the instances and ur done!
+
+        List<string[]> currentStrings = new List<string[]>();
+        string currentClass;
+
+        switch (assetName)
+        {
+            case "Unit":
+                {
+                    currentStrings = units;
+                    currentClass = "Unit";
+                    break;
+                }
+        }
+
+        //GameObject gameObject = Instantiate<>
+
+        //First split up the first line by tabs so you have your key for all other lines.
+        keyString = currentStrings[0];
+
+        //Now for each line after the first, break it up and add it to the list of string arrays.
+        for (int i = 1; i <  currentStrings.Count; i++)
+        {
+              
+        }
+        
     }
 }

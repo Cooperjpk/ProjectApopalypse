@@ -1,4 +1,0 @@
-Hai	curHealth	curDam
-Kawai	1	2
-Hawaii	5	7
-Ho why?	8	8

@@ -1,0 +1,2 @@
+technicalName	actHealth	actDamage
+elara	10	5
