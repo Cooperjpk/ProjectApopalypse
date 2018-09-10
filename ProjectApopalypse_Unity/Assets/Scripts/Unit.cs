@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-
+[RequireComponent(typeof(NavMeshAgent))]
 public class Unit : Entity {
 
     //States
@@ -11,7 +11,8 @@ public class Unit : Entity {
     {
         Idle,
         Move,
-        Attack
+        Attack,
+        Death
     }
     public States currentState;
 
@@ -76,10 +77,12 @@ public class Unit : Entity {
     }
     public MoveType moveType;
 
-    Transform target;
+    public List<Entity> targets = new List<Entity>();
     string priorityTargetTag;
 
     NavMeshAgent navMeshAgent;
+
+    int myLayer;
 
     //Called every time a State is entered
     void EnterState(States state)
@@ -161,6 +164,10 @@ public class Unit : Entity {
         {
             return States.Move;
         }
+        else if (!isAlive)
+        {
+            return States.Death;
+        }
         else
         {
             return States.Idle;
@@ -169,10 +176,13 @@ public class Unit : Entity {
 
     void Start()
     {
+        myLayer = gameObject.layer;
+
         navMeshAgent = GetComponent<NavMeshAgent>();
 
         //Find the closest target.
-        target = GetClosestEnemy(FindObjectsOfType<Entity>());
+        targets = GetAllEntities(FindObjectsOfType<Entity>());
+        targets.Sort(ByDistance);
 
         //Invoke the function that runs the behaviour for entering the intial currentState
         Invoke("Enter" + currentState.ToString() + "State", 0);
@@ -193,26 +203,70 @@ public class Unit : Entity {
 
         //Play update state of the current state
         UpdateState(currentState);
+
+        //Check if target is null or innactive
+        if(!target || !target.gameObject.activeSelf)
+        {
+            target = GetClosestTarget(FindObjectsOfType<Entity>());
+        }
     }
 
-    //https://forum.unity.com/threads/clean-est-way-to-find-nearest-object-of-many-c.44315/
-    Transform GetClosestEnemy(Entity[] targets)
+    List<Entity> GetAllEntities(Entity[] entities)
     {
+        List<Entity> potentialTargets = new List<Entity>();
+        foreach (Entity entity in entities)
+        {
+            if(entity.gameObject.layer != myLayer)
+            {
+                potentialTargets.Add(entity);
+            }
+        }
+        return potentialTargets;
+    }
+
+    int ByDistance(Entity entityA, Entity entityB)
+    {
+        float distanceToA = Vector3.Distance(transform.position, entityA.transform.position);
+        float distanceToB = Vector3.Distance(transform.position, entityB.transform.position);
+        return distanceToA.CompareTo(distanceToB);
+    }
+
+    /*
+    //https://forum.unity.com/threads/clean-est-way-to-find-nearest-object-of-many-c.44315/
+    Transform GetClosestTarget(Entity[] targets)
+    {
+        /*
         Transform bestTarget = null;
-        float closestDistanceSqr = Mathf.Infinity;
+        float closestDistance = Mathf.Infinity;
         Vector3 currentPosition = transform.position;
+
         foreach (Entity potentialTarget in targets)
         {
             Vector3 directionToTarget = potentialTarget.transform.position - currentPosition;
-            float dSqrToTarget = directionToTarget.sqrMagnitude;
-            if (dSqrToTarget < closestDistanceSqr)
+            float distanceToTarget = directionToTarget.sqrMagnitude;
+            if (distanceToTarget < closestDistance)
             {
-                closestDistanceSqr = dSqrToTarget;
+                closestDistance = distanceToTarget;
                 bestTarget = potentialTarget.transform;
             }   
         }
         return bestTarget;
+
+         function ByDistance(a : GameObject, b : GameObject) : int
+ {
+     var dstToA = Vector3.Distance(transform.position, a.transform.position);
+     var dstToB = Vector3.Distance(transform.position, b.transform.position);
+     return dstToA.CompareTo(dstToB);
+ }
+        
+
+        Entity[] entityArray = FindObjectsOfType<Entity>();
+        List<Entity> targets = new List<Entity>();
+
+        entities.Sort(ByDistance);
+
     }
+*/
 
     #region Idle
     void EnterIdleState()
@@ -229,31 +283,22 @@ public class Unit : Entity {
     void ExitIdleState()
     {
 
-
     }
     #endregion
 
     #region Move
     void EnterMoveState()
     {
-        if(target == null)
-        {
-            target = GetClosestEnemy(FindObjectsOfType<Entity>());
-        }
+
     }
 
     void MoveState()
     {
-        if (target == null)
-        {
-            target = GetClosestEnemy(FindObjectsOfType<Entity>());
-        }
         navMeshAgent.SetDestination(target.position);
     }
 
     void ExitMoveState()
     {
-
 
     }
     #endregion
@@ -261,21 +306,32 @@ public class Unit : Entity {
     #region Attack
     void EnterAttackState()
     {
-        if (target == null)
-        {
-            target = GetClosestEnemy(FindObjectsOfType<Entity>());
-        }
+
     }
 
     void AttackState()
     {
-        if (target == null)
-        {
-            target = GetClosestEnemy(FindObjectsOfType<Entity>());
-        }
+
     }
 
     void ExitAttackState()
+    {
+
+    }
+    #endregion
+
+    #region Death
+    void EnterDeathState()
+    {
+
+    }
+
+    void DeathState()
+    {
+
+    }
+
+    void ExitDeathState()
     {
 
 

@@ -136,6 +136,4 @@ public class Entity : MonoBehaviour
 
         damageFraction = 0;
     }
-
-
 }
