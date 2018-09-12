@@ -5,9 +5,9 @@ public class Variable : MonoBehaviour
 {
     public int integer;
 
-    bool isLocked;
-    int minInt = 0;
-    int maxInt = 999;
+    public bool isLocked;
+    public int minInt = 0;
+    public int maxInt = 999;
 
     public int Integer
     {
