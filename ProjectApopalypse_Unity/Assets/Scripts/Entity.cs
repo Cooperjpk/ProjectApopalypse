@@ -103,7 +103,7 @@ public class Entity : MonoBehaviour
 
     void Awake()
     {
-        LoadVariables();    
+        //LoadVariables();    
     }
 
     void Start()

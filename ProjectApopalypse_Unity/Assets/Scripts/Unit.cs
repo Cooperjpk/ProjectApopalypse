@@ -389,7 +389,10 @@ public class Unit : Entity {
 
     void MoveState()
     {
-        navMeshAgent.SetDestination(targets[0].transform.position);
+        if (targets[0] != null)
+        {
+            navMeshAgent.SetDestination(targets[0].transform.position);
+        }
     }
 
     void ExitMoveState()
