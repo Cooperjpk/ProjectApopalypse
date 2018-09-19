@@ -23,9 +23,8 @@ public class DataReader : MonoBehaviour
 
     void Awake()
     {
-        ReadFile("Unit");
-
-        InstantiateUnit("defaultUnit", transform.position, transform.rotation);
+        //ReadFile("Unit");
+        //InstantiateUnit("defaultUnit", transform.position, transform.rotation);
     }
 
     void InstantiateUnit(string instanceName, Vector3 spawnLocation, Quaternion spawnRotation)
@@ -51,7 +50,14 @@ public class DataReader : MonoBehaviour
             Type fieldType = fieldInfo.GetValue(unit).GetType();
             //Debug.Log(fieldType.ToString());
 
-            if (fieldType == typeof(string))
+            if (fieldType == typeof(string) && unitKey[i].Contains("attack"))
+            {
+                //This is straight up where the component that it needs to be added to the unit.
+                Debug.Log("What's poppin ITS ME, YA BOi COOOPP");
+                fieldInfo.SetValue(unit, unitString[i]);
+                Debug.Log(unitKey[i].ToString() + " set to " + fieldInfo.GetValue(unit));
+            }
+            else if (fieldType == typeof(string))
             {
                 fieldInfo.SetValue(unit, unitString[i]);
                 Debug.Log(unitKey[i].ToString() + " set to " + fieldInfo.GetValue(unit));

@@ -26,6 +26,12 @@ public class Unit : Entity {
     }
     public AttackType attackType;
 
+    public string attack1;
+    public string attack2;
+    public string attack3;
+    public string attack4;
+    public string attack5;
+
     int curBaseDamage;
     public Variable totBaseDamage;
     public int actBaseDamage;
@@ -117,6 +123,8 @@ public class Unit : Entity {
     int stoppingDistance = 2;
 
     int myLayer;
+
+    public List<Attack> attacks = new List<Attack>();
 
     //Called every time a State is entered
     void EnterState(States state)
