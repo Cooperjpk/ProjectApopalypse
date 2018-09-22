@@ -26,11 +26,7 @@ public class Unit : Entity {
     }
     public AttackType attackType;
 
-    public string attack1;
-    public string attack2;
-    public string attack3;
-    public string attack4;
-    public string attack5;
+    public string attackName;
 
     int curBaseDamage;
     public Variable totBaseDamage;

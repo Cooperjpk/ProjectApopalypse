@@ -5,6 +5,11 @@ using UnityEngine;
 
 public class Attack : MonoBehaviour
 {
+    public string technicalName;
+    public string displayName;
+    public int attackInt;
+    public bool attackBool;
+
     //All classes that inherit from this class will be static and can be called from the unit class.
 
     //Charge
@@ -29,10 +34,10 @@ public class Attack : MonoBehaviour
     }
     */
 
-    public static void SuperpowerAttack()
-    {
-        Debug.Log("Superpower is happneing people.");
-    }
+    //public static void SuperpowerAttack()
+    //{
+    //    Debug.Log("Superpower is happneing people.");
+    //}
 }
 
 

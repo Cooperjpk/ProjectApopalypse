@@ -1,0 +1,2 @@
+technicalName	displayName	attackInt	attackBool
+defaultAttack	Default Attack	95	FALSE

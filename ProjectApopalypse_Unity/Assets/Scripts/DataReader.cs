@@ -18,13 +18,18 @@ public class DataReader : MonoBehaviour
     public Unit unitDefault;
     string[] unitKey;
     List<string[]> unitInstances = new List<string[]>();
+    string[] unitStrings;
 
-    string[] unitString;
+    //Attacks
+    string[] attackKey;
+    List<string[]> attackInstances = new List<string[]>();
+    string[] attackStrings;
 
     void Awake()
     {
-        //ReadFile("Unit");
-        //InstantiateUnit("defaultUnit", transform.position, transform.rotation);
+        ReadFile("Units");
+        ReadFile("Attacks");
+        InstantiateUnit("defaultUnit", transform.position, transform.rotation);
     }
 
     void InstantiateUnit(string instanceName, Vector3 spawnLocation, Quaternion spawnRotation)
@@ -32,49 +37,104 @@ public class DataReader : MonoBehaviour
         //Instantiate the unit using the unitDefault and then applying changes.
         Unit unit = Instantiate<Unit>(unitDefault, spawnLocation, spawnRotation) as Unit;
 
-        //Search for the correct string array and then declare
+        //Search for the correct string array and then declare.
         for (int i = 0; i < unitInstances.Count; i++)
         {
             if (unitInstances[i][0] == instanceName)
             {
                 //Debug.Log(instanceName);
-                unitString = unitInstances[i];
+                unitStrings = unitInstances[i];
                 break;
             }
         }
 
         //Set all values of the unit based in what's in the string array.
-        for (int i = 0; i < unitString.Length; i++)
+        for (int i = 0; i < unitStrings.Length; i++)
         {
             FieldInfo fieldInfo = unit.GetType().GetField(unitKey[i]);
             Type fieldType = fieldInfo.GetValue(unit).GetType();
             //Debug.Log(fieldType.ToString());
 
-            if (fieldType == typeof(string) && unitKey[i].Contains("attack"))
+            if(unitKey[i] == "technicalName")
             {
-                //This is straight up where the component that it needs to be added to the unit.
-                Debug.Log("What's poppin ITS ME, YA BOi COOOPP");
-                fieldInfo.SetValue(unit, unitString[i]);
-                Debug.Log(unitKey[i].ToString() + " set to " + fieldInfo.GetValue(unit));
+                unit.name = unitStrings[i];
+                //Debug.Log(unitKey[i].ToString() + " set as unit's name);
             }
             else if (fieldType == typeof(string))
             {
-                fieldInfo.SetValue(unit, unitString[i]);
-                Debug.Log(unitKey[i].ToString() + " set to " + fieldInfo.GetValue(unit));
+                fieldInfo.SetValue(unit, unitStrings[i]);
+                //Debug.Log(unitKey[i].ToString() + " set to " + fieldInfo.GetValue(unit));
             }
             else if (fieldType == typeof(int))
             {
-                fieldInfo.SetValue(unit, int.Parse(unitString[i]));
-                Debug.Log(unitKey[i].ToString() + " set to " + fieldInfo.GetValue(unit));
+                fieldInfo.SetValue(unit, int.Parse(unitStrings[i]));
+                //Debug.Log(unitKey[i].ToString() + " set to " + fieldInfo.GetValue(unit));
             }
             else if (fieldType == typeof(bool))
             {
-                fieldInfo.SetValue(unit, bool.Parse(unitString[i]));
-                Debug.Log(unitKey[i].ToString() + " set to " + fieldInfo.GetValue(unit));
+                fieldInfo.SetValue(unit, bool.Parse(unitStrings[i]));
+                //Debug.Log(unitKey[i].ToString() + " set to " + fieldInfo.GetValue(unit));
             }
             else
             {
                 Debug.LogError(unitKey[i] + " was not parsed because the type hasn't been specified.");
+            }
+        }
+
+        //Now that all values have been set, add the Attack component.
+        AddAttackToUnit(unit, unit.attackName);
+    }
+
+    void AddAttackToUnit(Unit unit, string attackName)
+    {
+        //Add the Attack script component to the unit.
+        Attack attackingUnit = unit.gameObject.AddComponent<Attack>();
+
+        //Search for the correct string array and then declare.
+        for (int i = 0; i < attackInstances.Count; i++)
+        {
+            if (attackInstances[i][0] == attackName)
+            {
+                //Debug.Log(attackName);
+                attackStrings = attackInstances[i];
+                break;
+            }
+        }
+
+        //Set all values of the attack based in what's in the string array.
+        for (int i = 0; i < attackStrings.Length; i++)
+        {
+            /*
+            FieldInfo fieldInfo = attackingUnit.GetType().GetField(attackKey[i]);
+            //Debug.Log(attackKey[i]);
+            //The line below is getting an NRE and I'm not sure why. This is blocking the Attack variables.
+            Type fieldType = fieldInfo.GetValueDirect(attackingUnit).GetType();
+            Debug.Log(fieldType.ToString());
+            */
+
+            FieldInfo fieldInfo = attackingUnit.GetType().GetField(attackKey[i]);
+            Debug.Log(fieldInfo.GetValue(attackingUnit).ToString());
+            Type fieldType = fieldInfo.GetValue(attackingUnit).GetType();
+            //Debug.Log(fieldType.ToString());
+
+            if (fieldType == typeof(string))
+            {
+                fieldInfo.SetValue(attackingUnit, attackStrings[i]);
+                Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(attackingUnit));
+            }
+            else if (fieldType == typeof(int))
+            {
+                fieldInfo.SetValue(attackingUnit, int.Parse(attackStrings[i]));
+                Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(attackingUnit));
+            }
+            else if (fieldType == typeof(bool))
+            {
+                fieldInfo.SetValue(attackingUnit, bool.Parse(attackStrings[i]));
+                Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(attackingUnit));
+            }
+            else
+            {
+                Debug.LogError(attackKey[i] + " was not parsed because the type hasn't been specified.");
             }
         }
     }
@@ -93,7 +153,7 @@ public class DataReader : MonoBehaviour
                     Debug.LogError("The fileName is not set up for reading.");
                     break;
                 }
-            case "Unit":
+            case "Units":
                 {
                     //Signify the first row as the key strings and split by tabs.
                     unitKey = assetPaths[0].Split('\t');
@@ -106,14 +166,20 @@ public class DataReader : MonoBehaviour
                     }
                     break;
                 }
+            case "Attacks":
+                {
+                    //Signify the first row as the key strings and split by tabs.
+                    attackKey = assetPaths[0].Split('\t');
+
+                    //All other rows are instance strings and split by tabs.
+                    for (int i = 1; i < assetPaths.Length; i++)
+                    {
+                        string[] lineValues = assetPaths[i].Split('\t');
+                        attackInstances.Add(lineValues);
+                    }
+                    break;
+                }
         }
     }
-
-    public Type StringToType(string typeAsString)
-    {
-        Type typeAsType = Type.GetType(typeAsString);
-        return typeAsType;
-    }
-
 }
 
