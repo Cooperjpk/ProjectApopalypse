@@ -11,21 +11,27 @@ public class DataReader : MonoBehaviour
 
     //Units
     public Unit unitDefault;
-    public Attack attackDefault;
     string[] unitKey;
     List<string[]> unitInstances = new List<string[]>();
     string[] unitStrings;
 
     //Attacks
+    public Attack attackDefault;
     string[] attackKey;
     List<string[]> attackInstances = new List<string[]>();
     string[] attackStrings;
 
+    //Passives
+    public Passive passiveDefault;
+    string[] passiveKey;
+    List<string[]> passiveInstances = new List<string[]>();
+    string[] passiveStrings;
 
     void Awake()
     {
         ReadFile("Units");
         ReadFile("Attacks");
+        ReadFile("Passives");
         InstantiateUnit("defaultUnit", transform.position, transform.rotation);
     }
 
@@ -55,6 +61,7 @@ public class DataReader : MonoBehaviour
             if (unitKey[i] == "technicalName")
             {
                 unit.name = unitStrings[i];
+                fieldInfo.SetValue(unit, unitStrings[i]);
                 //Debug.Log(unitStrings[i].ToString() + " set as unit's name");
             }
             else if (fieldType == typeof(string))
@@ -78,7 +85,7 @@ public class DataReader : MonoBehaviour
             }
         }
 
-        //Now that all values have been set, add the Attack component.
+        //Now that all values have been set, add the Attack gameObjects.
         if (unit.attack1 != string.Empty)
         {
             AddAttackToUnit(unit, unit.attack1);
@@ -95,9 +102,23 @@ public class DataReader : MonoBehaviour
         {
             AddAttackToUnit(unit, unit.attack4);
         }
-        if (unit.attack5 != string.Empty)
+
+        //Now that all values have been set, add the Passive gameObjects.
+        if (unit.passive1 != string.Empty)
         {
-            AddAttackToUnit(unit, unit.attack5);
+            AddPassiveToUnit(unit, unit.passive1);
+        }
+        if (unit.passive2 != string.Empty)
+        {
+            AddPassiveToUnit(unit, unit.passive2);
+        }
+        if (unit.passive3 != string.Empty)
+        {
+            AddPassiveToUnit(unit, unit.passive3);
+        }
+        if (unit.passive4 != string.Empty)
+        {
+            AddPassiveToUnit(unit, unit.passive4);
         }
     }
 
@@ -148,6 +169,53 @@ public class DataReader : MonoBehaviour
         }
     }
 
+    void AddPassiveToUnit(Unit currentUnit, string passiveName)
+    {
+        //Add the Attack as a child gameobject to the current Unit 
+        Passive passive = Instantiate<Passive>(passiveDefault, currentUnit.transform.position, currentUnit.transform.rotation) as Passive;
+        passive.transform.parent = currentUnit.transform;
+
+        //Search for the correct string array and then declare.
+        for (int i = 0; i < attackInstances.Count; i++)
+        {
+            if (attackInstances[i][0] == passiveName)
+            {
+                //Debug.Log(attackName);
+                attackStrings = attackInstances[i];
+                break;
+            }
+        }
+
+        //Set all values of the attack based in what's in the string array.
+        for (int i = 0; i < attackStrings.Length; i++)
+        {
+            FieldInfo fieldInfo = passive.GetType().GetField(attackKey[i]);
+            //Debug.Log(attackKey[i]);
+            Type fieldType = fieldInfo.GetValue(passive).GetType();
+            //Debug.Log(fieldType.ToString());
+
+            if (fieldType == typeof(string))
+            {
+                fieldInfo.SetValue(passive, attackStrings[i]);
+                Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(passive));
+            }
+            else if (fieldType == typeof(int))
+            {
+                fieldInfo.SetValue(passive, int.Parse(attackStrings[i]));
+                Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(passive));
+            }
+            else if (fieldType == typeof(bool))
+            {
+                fieldInfo.SetValue(passive, bool.Parse(attackStrings[i]));
+                Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(passive));
+            }
+            else
+            {
+                Debug.LogError(attackKey[i] + " was not parsed because the type hasn't been specified.");
+            }
+        }
+    }
+
     void ReadFile(string fileName)
     {
         //Open the file from the streaming assets folder.
@@ -185,6 +253,19 @@ public class DataReader : MonoBehaviour
                     {
                         string[] lineValues = assetPaths[i].Split('\t');
                         attackInstances.Add(lineValues);
+                    }
+                    break;
+                }
+            case "Passives":
+                {
+                    //Signify the first row as the key strings and split by tabs.
+                    passiveKey = assetPaths[0].Split('\t');
+
+                    //All other rows are instance strings and split by tabs.
+                    for (int i = 1; i < assetPaths.Length; i++)
+                    {
+                        string[] lineValues = assetPaths[i].Split('\t');
+                        passiveInstances.Add(lineValues);
                     }
                     break;
                 }

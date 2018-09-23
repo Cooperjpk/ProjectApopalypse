@@ -30,7 +30,11 @@ public class Unit : Entity {
     public string attack2;
     public string attack3;
     public string attack4;
-    public string attack5;
+
+    public string passive1;
+    public string passive2;
+    public string passive3;
+    public string passive4;
 
     int curBaseDamage;
     public Variable totBaseDamage;

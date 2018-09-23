@@ -1,0 +1,2 @@
+technicalName	displayName
+defaultPassive	Default Passive
