@@ -7,15 +7,11 @@ using System.Reflection;
 
 public class DataReader : MonoBehaviour
 {
-    //Check StreamingAssets and get a list of strings for each of the files to find in the StreamingAssets folder.
-    //This class looks at a list of JSON files and reads them all.
-    //Each of the files are then read and the name of the file decides what type of class will be created.
-    //Each of files are ran for each row that's in them. All public instances are created.
-
     string[] assetPaths;
 
     //Units
     public Unit unitDefault;
+    public Attack test;
     string[] unitKey;
     List<string[]> unitInstances = new List<string[]>();
     string[] unitStrings;
@@ -24,6 +20,7 @@ public class DataReader : MonoBehaviour
     string[] attackKey;
     List<string[]> attackInstances = new List<string[]>();
     string[] attackStrings;
+
 
     void Awake()
     {
@@ -55,10 +52,10 @@ public class DataReader : MonoBehaviour
             Type fieldType = fieldInfo.GetValue(unit).GetType();
             //Debug.Log(fieldType.ToString());
 
-            if(unitKey[i] == "technicalName")
+            if (unitKey[i] == "technicalName")
             {
                 unit.name = unitStrings[i];
-                //Debug.Log(unitKey[i].ToString() + " set as unit's name);
+                //Debug.Log(unitStrings[i].ToString() + " set as unit's name");
             }
             else if (fieldType == typeof(string))
             {
@@ -85,10 +82,16 @@ public class DataReader : MonoBehaviour
         AddAttackToUnit(unit, unit.attackName);
     }
 
-    void AddAttackToUnit(Unit unit, string attackName)
+    void AddAttackToUnit(Unit currentUnit, string attackName)
     {
         //Add the Attack script component to the unit.
-        Attack attackingUnit = unit.gameObject.AddComponent<Attack>();
+        //unit.gameObject.AddComponent<Attack>();
+        //Attack attackingUnit = unit.GetComponent<Attack>();
+        //Attack attackingUnit = currentUnit.gameObject.AddComponent<Attack>();
+        //Attack attack = Instantiate<Attack>(test, transform.position, transform.rotation) as Attack;
+
+        currentUnit.gameObject.AddComponent<Attack>();
+        Attack attack = FindObjectOfType<Attack>();
 
         //Search for the correct string array and then declare.
         for (int i = 0; i < attackInstances.Count; i++)
@@ -104,33 +107,26 @@ public class DataReader : MonoBehaviour
         //Set all values of the attack based in what's in the string array.
         for (int i = 0; i < attackStrings.Length; i++)
         {
-            /*
-            FieldInfo fieldInfo = attackingUnit.GetType().GetField(attackKey[i]);
+            FieldInfo fieldInfo = attack.GetType().GetField(attackKey[i]);
             //Debug.Log(attackKey[i]);
-            //The line below is getting an NRE and I'm not sure why. This is blocking the Attack variables.
-            Type fieldType = fieldInfo.GetValueDirect(attackingUnit).GetType();
-            Debug.Log(fieldType.ToString());
-            */
-
-            FieldInfo fieldInfo = attackingUnit.GetType().GetField(attackKey[i]);
-            Debug.Log(fieldInfo.GetValue(attackingUnit).ToString());
-            Type fieldType = fieldInfo.GetValue(attackingUnit).GetType();
+            //Debug.Log(fieldInfo.GetValue(currentUnit.GetComponent<Attack>()).ToString());
+            Type fieldType = fieldInfo.GetValue(attack).GetType();
             //Debug.Log(fieldType.ToString());
 
             if (fieldType == typeof(string))
             {
-                fieldInfo.SetValue(attackingUnit, attackStrings[i]);
-                Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(attackingUnit));
+                fieldInfo.SetValue(attack, attackStrings[i]);
+                Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(attack));
             }
             else if (fieldType == typeof(int))
             {
-                fieldInfo.SetValue(attackingUnit, int.Parse(attackStrings[i]));
-                Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(attackingUnit));
+                fieldInfo.SetValue(attack, int.Parse(attackStrings[i]));
+                Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(attack));
             }
             else if (fieldType == typeof(bool))
             {
-                fieldInfo.SetValue(attackingUnit, bool.Parse(attackStrings[i]));
-                Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(attackingUnit));
+                fieldInfo.SetValue(attack, bool.Parse(attackStrings[i]));
+                Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(attack));
             }
             else
             {

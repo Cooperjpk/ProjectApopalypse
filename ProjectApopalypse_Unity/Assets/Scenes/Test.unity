@@ -144,6 +144,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitDefault: {fileID: 114740682017336948, guid: c59629de62a19394db782bdecc15f746,
     type: 2}
+  test: {fileID: 114382810827361750, guid: 4c1f623529a4f5143942e0ffee611409, type: 2}
 --- !u!81 &986793
 AudioListener:
   m_ObjectHideFlags: 0
