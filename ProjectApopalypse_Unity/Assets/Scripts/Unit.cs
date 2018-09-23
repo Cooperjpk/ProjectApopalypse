@@ -26,7 +26,11 @@ public class Unit : Entity {
     }
     public AttackType attackType;
 
-    public string attackName;
+    public string attack1;
+    public string attack2;
+    public string attack3;
+    public string attack4;
+    public string attack5;
 
     int curBaseDamage;
     public Variable totBaseDamage;
@@ -218,6 +222,8 @@ public class Unit : Entity {
 
         navMeshAgent = GetComponent<NavMeshAgent>();
         navMeshAgent.stoppingDistance = stoppingDistance;
+
+
 
         //Find the closest target.
         targets = GetAllEntities(FindObjectsOfType<Entity>());
@@ -413,7 +419,7 @@ public class Unit : Entity {
 
     void AttackState()
     {
-
+        
     }
 
     void ExitAttackState()

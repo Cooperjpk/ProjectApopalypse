@@ -7,16 +7,14 @@ public class Attack : MonoBehaviour
 {
     public string technicalName;
     public string displayName;
-    public int attackInt;
-    public bool attackBool;
 
-    //All classes that inherit from this class will be static and can be called from the unit class.
+    Unit unit;
 
-    //Charge
     //The number of charges that can be stored from the charge time.
+    public int charges = 1;
 
-    //Salvo
     //The number of times the ability can be set off when the cooldown is up.
+    public int salvo = 1;
 
     //Directly applied damage to target
     //Area damage splash damage
@@ -24,20 +22,15 @@ public class Attack : MonoBehaviour
     //Damage dealt
     //Effects applied
 
-    //Target type(s) (Ground, Flying)
+    void Awake()
+    {
+        unit = transform.parent.GetComponent<Unit>();    
+    }
 
-    /*
-    public virtual void UseAbility()
+    public void UseAttack()
     {
         //Ability stuff happens here in the inheritting classes...
-        Debug.Log("This is the ability");
     }
-    */
-
-    //public static void SuperpowerAttack()
-    //{
-    //    Debug.Log("Superpower is happneing people.");
-    //}
 }
 
 

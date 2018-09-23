@@ -11,7 +11,7 @@ public class DataReader : MonoBehaviour
 
     //Units
     public Unit unitDefault;
-    public Attack test;
+    public Attack attackDefault;
     string[] unitKey;
     List<string[]> unitInstances = new List<string[]>();
     string[] unitStrings;
@@ -79,19 +79,33 @@ public class DataReader : MonoBehaviour
         }
 
         //Now that all values have been set, add the Attack component.
-        AddAttackToUnit(unit, unit.attackName);
+        if (unit.attack1 != string.Empty)
+        {
+            AddAttackToUnit(unit, unit.attack1);
+        }
+        if (unit.attack2 != string.Empty)
+        {
+            AddAttackToUnit(unit, unit.attack2);
+        }
+        if (unit.attack3 != string.Empty)
+        {
+            AddAttackToUnit(unit, unit.attack3);
+        }
+        if (unit.attack4 != string.Empty)
+        {
+            AddAttackToUnit(unit, unit.attack4);
+        }
+        if (unit.attack5 != string.Empty)
+        {
+            AddAttackToUnit(unit, unit.attack5);
+        }
     }
 
     void AddAttackToUnit(Unit currentUnit, string attackName)
     {
-        //Add the Attack script component to the unit.
-        //unit.gameObject.AddComponent<Attack>();
-        //Attack attackingUnit = unit.GetComponent<Attack>();
-        //Attack attackingUnit = currentUnit.gameObject.AddComponent<Attack>();
-        //Attack attack = Instantiate<Attack>(test, transform.position, transform.rotation) as Attack;
-
-        currentUnit.gameObject.AddComponent<Attack>();
-        Attack attack = FindObjectOfType<Attack>();
+        //Add the Attack as a child gameobject to the current Unit 
+        Attack attack = Instantiate<Attack>(attackDefault, currentUnit.transform.position, currentUnit.transform.rotation) as Attack;
+        attack.transform.parent = currentUnit.transform;
 
         //Search for the correct string array and then declare.
         for (int i = 0; i < attackInstances.Count; i++)
@@ -109,7 +123,6 @@ public class DataReader : MonoBehaviour
         {
             FieldInfo fieldInfo = attack.GetType().GetField(attackKey[i]);
             //Debug.Log(attackKey[i]);
-            //Debug.Log(fieldInfo.GetValue(currentUnit.GetComponent<Attack>()).ToString());
             Type fieldType = fieldInfo.GetValue(attack).GetType();
             //Debug.Log(fieldType.ToString());
 
