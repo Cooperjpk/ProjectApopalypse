@@ -26,6 +26,8 @@ public class Unit : Entity {
     }
     public AttackType attackType;
 
+    public string basicAttack;
+
     public string attack1;
     public string attack2;
     public string attack3;

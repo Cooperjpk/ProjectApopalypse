@@ -32,7 +32,7 @@ public class DataReader : MonoBehaviour
         ReadFile("Units");
         ReadFile("Attacks");
         ReadFile("Passives");
-        InstantiateUnit("defaultUnit", transform.position, transform.rotation);
+        InstantiateUnit("alexa", transform.position, transform.rotation);
     }
 
     void InstantiateUnit(string instanceName, Vector3 spawnLocation, Quaternion spawnRotation)
@@ -51,7 +51,7 @@ public class DataReader : MonoBehaviour
             }
         }
 
-        //Set all values of the unit based in what's in the string array.
+        //Set all values of the unit based on what's in the string array.
         for (int i = 0; i < unitStrings.Length; i++)
         {
             FieldInfo fieldInfo = unit.GetType().GetField(unitKey[i]);
@@ -150,17 +150,17 @@ public class DataReader : MonoBehaviour
             if (fieldType == typeof(string))
             {
                 fieldInfo.SetValue(attack, attackStrings[i]);
-                Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(attack));
+                //Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(attack));
             }
             else if (fieldType == typeof(int))
             {
                 fieldInfo.SetValue(attack, int.Parse(attackStrings[i]));
-                Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(attack));
+                //Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(attack));
             }
             else if (fieldType == typeof(bool))
             {
                 fieldInfo.SetValue(attack, bool.Parse(attackStrings[i]));
-                Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(attack));
+                //Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(attack));
             }
             else
             {
@@ -173,6 +173,7 @@ public class DataReader : MonoBehaviour
     {
         //Add the Attack as a child gameobject to the current Unit 
         Passive passive = Instantiate<Passive>(passiveDefault, currentUnit.transform.position, currentUnit.transform.rotation) as Passive;
+        Debug.Log(passive.name);
         passive.transform.parent = currentUnit.transform;
 
         //Search for the correct string array and then declare.

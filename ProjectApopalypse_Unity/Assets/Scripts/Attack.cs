@@ -8,8 +8,6 @@ public class Attack : MonoBehaviour
     public string technicalName;
     public string displayName;
 
-    Unit unit;
-
     //The number of charges that can be stored from the charge time.
     public int charges = 1;
 
@@ -21,11 +19,6 @@ public class Attack : MonoBehaviour
 
     //Damage dealt
     //Effects applied
-
-    void Awake()
-    {
-        unit = transform.parent.GetComponent<Unit>();    
-    }
 
     public void UseAttack()
     {
