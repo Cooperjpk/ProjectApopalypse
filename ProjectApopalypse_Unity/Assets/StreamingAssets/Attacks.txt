@@ -1,2 +1,2 @@
-technicalName	displayName
-defaultAttack	Default Attack
+technicalName	displayName	description
+defaultAttack	Default Attack	This is the default attack. It literally does nothing sooooo…

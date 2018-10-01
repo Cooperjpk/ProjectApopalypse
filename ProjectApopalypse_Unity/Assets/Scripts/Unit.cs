@@ -28,11 +28,6 @@ public class Unit : Entity {
 
     public string basicAttack;
 
-    public string attack1;
-    public string attack2;
-    public string attack3;
-    public string attack4;
-
     public string passive1;
     public string passive2;
     public string passive3;
@@ -114,6 +109,20 @@ public class Unit : Entity {
     public int actMoveSpeedMax;
     public int actMoveSpeedMin;
     public bool actMoveSpeedLocked;
+
+    int curCharges;
+    public Variable totCharges;
+    public int actCharges;
+    public int actChargesMax;
+    public int actChargesMin;
+    public bool actChargesLocked;
+
+    int curSalvo;
+    public Variable totSalvo;
+    public int actSalvo;
+    public int actSalvoMax;
+    public int actSalvoMin;
+    public bool actSalvoLocked;
 
     public enum MoveType
     {
@@ -228,8 +237,6 @@ public class Unit : Entity {
 
         navMeshAgent = GetComponent<NavMeshAgent>();
         navMeshAgent.stoppingDistance = stoppingDistance;
-
-
 
         //Find the closest target.
         targets = GetAllEntities(FindObjectsOfType<Entity>());

@@ -1,2 +1,2 @@
-technicalName	displayName
-defaultPassive	Default Passive
+technicalName	displayName	description
+defaultPassive	Default Passive	This is the default passive. Straight up you don't want this it does nuttin.

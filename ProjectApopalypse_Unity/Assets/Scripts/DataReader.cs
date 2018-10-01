@@ -15,12 +15,6 @@ public class DataReader : MonoBehaviour
     List<string[]> unitInstances = new List<string[]>();
     string[] unitStrings;
 
-    //Attacks
-    public Attack attackDefault;
-    string[] attackKey;
-    List<string[]> attackInstances = new List<string[]>();
-    string[] attackStrings;
-
     //Passives
     public Passive passiveDefault;
     string[] passiveKey;
@@ -30,9 +24,8 @@ public class DataReader : MonoBehaviour
     void Awake()
     {
         ReadFile("Units");
-        ReadFile("Attacks");
         ReadFile("Passives");
-        InstantiateUnit("alexa", transform.position, transform.rotation);
+        InstantiateUnit("defaultUnit", transform.position, transform.rotation);
     }
 
     void InstantiateUnit(string instanceName, Vector3 spawnLocation, Quaternion spawnRotation)
@@ -79,30 +72,19 @@ public class DataReader : MonoBehaviour
                 fieldInfo.SetValue(unit, bool.Parse(unitStrings[i]));
                 //Debug.Log(unitKey[i].ToString() + " set to " + fieldInfo.GetValue(unit));
             }
+            else if (fieldType == typeof(Unit.AttackType))
+            {
+                //Debug.Log("Holla, we're here.");
+                Unit.AttackType attackType = (Unit.AttackType)System.Enum.Parse( typeof( Unit.AttackType ), unitStrings[i]);
+                fieldInfo.SetValue(unit, attackType);
+                //Debug.Log(unitKey[i].ToString() + " set to " + fieldInfo.GetValue(unit));
+            }
             else
             {
                 Debug.LogError(unitKey[i] + " was not parsed because the type hasn't been specified.");
             }
         }
-
-        //Now that all values have been set, add the Attack gameObjects.
-        if (unit.attack1 != string.Empty)
-        {
-            AddAttackToUnit(unit, unit.attack1);
-        }
-        if (unit.attack2 != string.Empty)
-        {
-            AddAttackToUnit(unit, unit.attack2);
-        }
-        if (unit.attack3 != string.Empty)
-        {
-            AddAttackToUnit(unit, unit.attack3);
-        }
-        if (unit.attack4 != string.Empty)
-        {
-            AddAttackToUnit(unit, unit.attack4);
-        }
-
+        
         //Now that all values have been set, add the Passive gameObjects.
         if (unit.passive1 != string.Empty)
         {
@@ -122,97 +104,55 @@ public class DataReader : MonoBehaviour
         }
     }
 
-    void AddAttackToUnit(Unit currentUnit, string attackName)
-    {
-        //Add the Attack as a child gameobject to the current Unit 
-        Attack attack = Instantiate<Attack>(attackDefault, currentUnit.transform.position, currentUnit.transform.rotation) as Attack;
-        attack.transform.parent = currentUnit.transform;
-
-        //Search for the correct string array and then declare.
-        for (int i = 0; i < attackInstances.Count; i++)
-        {
-            if (attackInstances[i][0] == attackName)
-            {
-                //Debug.Log(attackName);
-                attackStrings = attackInstances[i];
-                break;
-            }
-        }
-
-        //Set all values of the attack based in what's in the string array.
-        for (int i = 0; i < attackStrings.Length; i++)
-        {
-            FieldInfo fieldInfo = attack.GetType().GetField(attackKey[i]);
-            //Debug.Log(attackKey[i]);
-            Type fieldType = fieldInfo.GetValue(attack).GetType();
-            //Debug.Log(fieldType.ToString());
-
-            if (fieldType == typeof(string))
-            {
-                fieldInfo.SetValue(attack, attackStrings[i]);
-                //Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(attack));
-            }
-            else if (fieldType == typeof(int))
-            {
-                fieldInfo.SetValue(attack, int.Parse(attackStrings[i]));
-                //Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(attack));
-            }
-            else if (fieldType == typeof(bool))
-            {
-                fieldInfo.SetValue(attack, bool.Parse(attackStrings[i]));
-                //Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(attack));
-            }
-            else
-            {
-                Debug.LogError(attackKey[i] + " was not parsed because the type hasn't been specified.");
-            }
-        }
-    }
-
     void AddPassiveToUnit(Unit currentUnit, string passiveName)
     {
         //Add the Attack as a child gameobject to the current Unit 
         Passive passive = Instantiate<Passive>(passiveDefault, currentUnit.transform.position, currentUnit.transform.rotation) as Passive;
-        Debug.Log(passive.name);
         passive.transform.parent = currentUnit.transform;
 
         //Search for the correct string array and then declare.
-        for (int i = 0; i < attackInstances.Count; i++)
+        for (int i = 0; i < passiveInstances.Count; i++)
         {
-            if (attackInstances[i][0] == passiveName)
+            if (passiveInstances[i][0] == passiveName)
             {
                 //Debug.Log(attackName);
-                attackStrings = attackInstances[i];
+                passiveStrings = passiveInstances[i];
                 break;
             }
         }
 
         //Set all values of the attack based in what's in the string array.
-        for (int i = 0; i < attackStrings.Length; i++)
+        for (int i = 0; i < passiveStrings.Length; i++)
         {
-            FieldInfo fieldInfo = passive.GetType().GetField(attackKey[i]);
+            FieldInfo fieldInfo = passive.GetType().GetField(passiveKey[i]);
             //Debug.Log(attackKey[i]);
             Type fieldType = fieldInfo.GetValue(passive).GetType();
             //Debug.Log(fieldType.ToString());
 
-            if (fieldType == typeof(string))
+            if (unitKey[i] == "technicalName")
             {
-                fieldInfo.SetValue(passive, attackStrings[i]);
-                Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(passive));
+                passive.name = passiveStrings[i];
+                fieldInfo.SetValue(passive, passiveStrings[i]);
+                //Debug.Log(passiveStrings[i].ToString() + " set as passive's name");
+            }
+            else if (fieldType == typeof(string))
+            {
+                fieldInfo.SetValue(passive, passiveStrings[i]);
+                //Debug.Log(passiveKey[i].ToString() + " set to " + fieldInfo.GetValue(passive));
             }
             else if (fieldType == typeof(int))
             {
-                fieldInfo.SetValue(passive, int.Parse(attackStrings[i]));
-                Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(passive));
+                fieldInfo.SetValue(passive, int.Parse(passiveStrings[i]));
+                //Debug.Log(passiveKey[i].ToString() + " set to " + fieldInfo.GetValue(passive));
             }
             else if (fieldType == typeof(bool))
             {
-                fieldInfo.SetValue(passive, bool.Parse(attackStrings[i]));
-                Debug.Log(attackKey[i].ToString() + " set to " + fieldInfo.GetValue(passive));
+                fieldInfo.SetValue(passive, bool.Parse(passiveStrings[i]));
+                //Debug.Log(passiveKey[i].ToString() + " set to " + fieldInfo.GetValue(passive));
             }
             else
             {
-                Debug.LogError(attackKey[i] + " was not parsed because the type hasn't been specified.");
+                Debug.LogError(passiveKey[i] + " was not parsed because the type hasn't been specified.");
             }
         }
     }
@@ -241,19 +181,6 @@ public class DataReader : MonoBehaviour
                     {
                         string[] lineValues = assetPaths[i].Split('\t');
                         unitInstances.Add(lineValues);
-                    }
-                    break;
-                }
-            case "Attacks":
-                {
-                    //Signify the first row as the key strings and split by tabs.
-                    attackKey = assetPaths[0].Split('\t');
-
-                    //All other rows are instance strings and split by tabs.
-                    for (int i = 1; i < assetPaths.Length; i++)
-                    {
-                        string[] lineValues = assetPaths[i].Split('\t');
-                        attackInstances.Add(lineValues);
                     }
                     break;
                 }
