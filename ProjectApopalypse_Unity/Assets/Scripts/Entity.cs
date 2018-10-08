@@ -87,12 +87,6 @@ public class Entity : MonoBehaviour
         Splash
     }
 
-    public enum DamageSource
-    {
-        Troop,
-        Structure
-    }
-
     int damageFraction = 0;
 
     void Start()
@@ -101,7 +95,7 @@ public class Entity : MonoBehaviour
         render = GetComponent<Renderer>();
     }
 
-    public void ChangeHealth(int damage, DamageType damageType, DamageSource damageSource)
+    public void ChangeHealth(int damage, DamageType damageType, string damageSource)
     {
         switch (damageType)
         {
@@ -119,12 +113,17 @@ public class Entity : MonoBehaviour
 
         switch (damageSource)
         {
-            case DamageSource.Troop:
+            default:
+                {
+                    Debug.Log("The damageSource did not have a recorded tag");
+                    break;
+                }
+            case "Troop":
                 {
                     damageFraction += curTroopArmor;
                     break;
                 }
-            case DamageSource.Structure:
+            case "Structure":
                 {
                     damageFraction += curStructureArmor;
                     break;
@@ -139,7 +138,6 @@ public class Entity : MonoBehaviour
         {
             curHealth = 0;
             isAlive = false;
-            //Death happens here.
         }
         else if (curHealth >= actHealth)
         {

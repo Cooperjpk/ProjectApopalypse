@@ -67,15 +67,26 @@ public class DataReader : MonoBehaviour
                 fieldInfo.SetValue(unit, int.Parse(unitStrings[i]));
                 //Debug.Log(unitKey[i].ToString() + " set to " + fieldInfo.GetValue(unit));
             }
+            else if (fieldType == typeof(float))
+            {
+                fieldInfo.SetValue(unit, float.Parse(unitStrings[i]));
+                //Debug.Log(unitKey[i].ToString() + " set to " + fieldInfo.GetValue(unit));
+            }
             else if (fieldType == typeof(bool))
             {
                 fieldInfo.SetValue(unit, bool.Parse(unitStrings[i]));
                 //Debug.Log(unitKey[i].ToString() + " set to " + fieldInfo.GetValue(unit));
             }
-            else if (fieldType == typeof(Unit.AttackType))
+            else if (fieldType == typeof(Unit.AttackOrigin))
             {
-                Unit.AttackType attackType = (Unit.AttackType)System.Enum.Parse( typeof( Unit.AttackType ), unitStrings[i]);
-                fieldInfo.SetValue(unit, attackType);
+                Unit.AttackOrigin attackOrigin = (Unit.AttackOrigin)System.Enum.Parse( typeof( Unit.AttackOrigin ), unitStrings[i]);
+                fieldInfo.SetValue(unit, attackOrigin);
+                //Debug.Log(unitKey[i].ToString() + " set to " + fieldInfo.GetValue(unit));
+            }
+            else if (fieldType == typeof(Unit.SplashType))
+            {
+                Unit.SplashType splashType = (Unit.SplashType)System.Enum.Parse(typeof(Unit.SplashType), unitStrings[i]);
+                fieldInfo.SetValue(unit, splashType);
                 //Debug.Log(unitKey[i].ToString() + " set to " + fieldInfo.GetValue(unit));
             }
             else if (fieldType == typeof(Unit.MoveType))

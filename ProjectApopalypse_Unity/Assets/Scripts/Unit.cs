@@ -25,9 +25,28 @@ public class Unit : Entity
         Melee,
         Ranged
     }
-    public AttackType attackType;
+    AttackType attackType;
 
-    float timeStamp;
+    public enum SplashType
+    {
+        Line,
+        Sphere,
+        Box,
+        Capsule
+    }
+    public SplashType splashType;
+
+    public enum AttackOrigin
+    {
+        Self,
+        Targets
+    }
+    public AttackOrigin attackOrigin;
+
+    float cooldownStamp;
+    float chargeStamp;
+
+    public float salvoRate;
 
     public string passive1;
     public string passive2;
@@ -112,6 +131,12 @@ public class Unit : Entity
     public int actSalvoMin;
     public bool actSalvoLocked;
 
+    int curTargets;
+    public int actTargets;
+    public int actTargetsMax;
+    public int actTargetsMin;
+    public bool actTargetsLocked;
+
     public enum MoveType
     {
         Ground,
@@ -124,6 +149,7 @@ public class Unit : Entity
 
     NavMeshAgent navMeshAgent;
     int stoppingDistance = 2;
+    static int meleeCutOff = 2;
 
     int myLayer;
 
@@ -198,19 +224,22 @@ public class Unit : Entity
 
     States DecideState()
     {
-        //Logic goes here...
-        if (canAttack && curRange >= Vector3.Distance(targets[0].transform.position, transform.position))
+        //If the unit is not alive, it is dead. First priority state.
+        if (!isAlive)
+        {
+            return States.Death;
+        }
+        //If the unit can attack, is in range and is fully charged, then attack.
+        else if (canAttack && curRange >= Vector3.Distance(targets[0].transform.position, transform.position) && chargeStamp <= Time.time)
         {
             return States.Attack;
         }
+        //If the unit is mobile, it should move.
         else if (canMove)
         {
             return States.Move;
         }
-        else if (!isAlive)
-        {
-            return States.Death;
-        }
+        //If the unit has nothing to do, just stand idly.
         else
         {
             return States.Idle;
@@ -230,6 +259,17 @@ public class Unit : Entity
 
         //Invoke the function that runs the behaviour for entering the intial currentState
         Invoke("Enter" + currentState.ToString() + "State", 0);
+
+        //Decide whether the unit is melee or ranged depending on their range and then lock their range in.
+        if (actRange <= meleeCutOff)
+        {
+            attackType = AttackType.Melee;
+            actRangeLocked = true;
+        }
+        else
+        {
+            attackType = AttackType.Ranged;
+        }
     }
 
     void Update()
@@ -406,10 +446,27 @@ public class Unit : Entity
 
     void UseAttack()
     {
-        if(timeStamp <= Time.time)
+        if (cooldownStamp <= Time.time)
         {
             Debug.Log("Use the ability!");
-            timeStamp = Time.time + curCooldown;
+
+            //Reset the cooldown.
+            cooldownStamp = Time.time + curCooldown;
+
+            //Reset the charge time.
+            chargeStamp = Time.time + curChargeTime;
+
+            //RELEASE ATTACKS AT salvoRate FOR SALVO NUMBER
+            for (int i = 0; i > curSalvo; i++)
+            {
+                AttackFunctionality();
+            }
+
+            //ATTACK
+            //If direct, apply damage and effects to target(s)
+            //If splash, create a raycast line or other shape depending on the mode that was selected.
+            //Define the location, direction and size of the shape.
+            //When things are hit, check their tag and then apply damage and effects.
 
             //Attack functionality happens here
             //curBaseDamage
@@ -425,6 +482,23 @@ public class Unit : Entity
             //curMoveSpeed
             //curSalvo
             //curCharges
+
+        }
+    }
+
+    void AttackFunctionality()
+    {
+        //If the unit has direct damage, deal that damage to targets[] (curTargets).
+        if (curDirectDamage > 0)
+        {
+            for (int i = 0; i > curTargets; i++)
+            {
+                targets[i].ChangeHealth(curDirectDamage + curBaseDamage, DamageType.Direct, gameObject.tag);
+            }
+        }
+
+        if (curSplashRadius > 0)
+        {
 
         }
     }
