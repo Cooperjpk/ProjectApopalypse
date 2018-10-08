@@ -4,7 +4,8 @@ using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
-public class Unit : Entity {
+public class Unit : Entity
+{
 
     //States
     public enum States
@@ -26,7 +27,7 @@ public class Unit : Entity {
     }
     public AttackType attackType;
 
-    public string basicAttack;
+    float timeStamp;
 
     public string passive1;
     public string passive2;
@@ -34,91 +35,78 @@ public class Unit : Entity {
     public string passive4;
 
     int curBaseDamage;
-    public Variable totBaseDamage;
     public int actBaseDamage;
     public int actBaseDamageMax;
     public int actBaseDamageMin;
     public bool actBaseDamageLocked;
 
     int curTroopDamage;
-    public Variable totTroopDamage;
     public int actTroopDamage;
     public int actTroopDamageMax;
     public int actTroopDamageMin;
     public bool actTroopDamageLocked;
 
     int curCoreDamage;
-    public Variable totCoreDamage;
     public int actCoreDamage;
     public int actCoreDamageMax;
     public int actCoreDamageMin;
     public bool actCoreDamageLocked;
 
     int curChestDamage;
-    public Variable totChestDamage;
     public int actChestDamage;
     public int actChestDamageMax;
     public int actChestDamageMin;
     public bool actChestDamageLocked;
 
     int curDirectDamage;
-    public Variable totDirectDamage;
     public int actDirectDamage;
     public int actDirectDamageMax;
     public int actDirectDamageMin;
     public bool actDirectDamageLocked;
 
     int curSplashDamage;
-    public Variable totSplashDamage;
     public int actSplashDamage;
     public int actSplashDamageMax;
     public int actSplashDamageMin;
     public bool actSplashDamageLocked;
 
     int curCooldown;
-    public Variable totCooldown;
     public int actCooldown;
     public int actCooldownMax;
     public int actCooldownMin;
     public bool actCooldownLocked;
 
     int curChargeTime;
-    public Variable totChargeTime;
     public int actChargeTime;
     public int actChargeTimeMax;
     public int actChargeTimeMin;
     public bool actChargeTimeLocked;
 
     int curSplashRadius;
-    public Variable totSplashRadius;
     public int actSplashRadius;
     public int actSplashRadiusMax;
     public int actSplashRadiusMin;
     public bool actSplashRadiusLocked;
 
     int curRange;
-    public Variable totRange;
     public int actRange;
     public int actRangeMax;
     public int actRangeMin;
     public bool actRangeLocked;
 
     int curMoveSpeed;
-    public Variable totMoveSpeed;
     public int actMoveSpeed;
     public int actMoveSpeedMax;
     public int actMoveSpeedMin;
     public bool actMoveSpeedLocked;
 
     int curCharges;
-    public Variable totCharges;
     public int actCharges;
     public int actChargesMax;
     public int actChargesMin;
     public bool actChargesLocked;
 
     int curSalvo;
-    public Variable totSalvo;
     public int actSalvo;
     public int actSalvoMax;
     public int actSalvoMin;
@@ -138,8 +126,6 @@ public class Unit : Entity {
     int stoppingDistance = 2;
 
     int myLayer;
-
-    public List<Attack> attacks = new List<Attack>();
 
     //Called every time a State is entered
     void EnterState(States state)
@@ -213,7 +199,7 @@ public class Unit : Entity {
     States DecideState()
     {
         //Logic goes here...
-        if (canAttack && curRange <= Vector3.Distance(targets[0].transform.position, transform.position))
+        if (canAttack && curRange >= Vector3.Distance(targets[0].transform.position, transform.position))
         {
             return States.Attack;
         }
@@ -263,7 +249,7 @@ public class Unit : Entity {
         UpdateState(currentState);
 
         //Check if target is null or innactive
-        if(!targets[0] || !targets[0].gameObject.activeSelf)
+        if (!targets[0] || !targets[0].gameObject.activeSelf)
         {
             targets = GetAllEntities(FindObjectsOfType<Entity>());
         }
@@ -274,7 +260,7 @@ public class Unit : Entity {
         List<Entity> potentialTargets = new List<Entity>();
         foreach (Entity entity in entities)
         {
-            if(entity.gameObject.layer != myLayer)
+            if (entity.gameObject.layer != myLayer)
             {
                 potentialTargets.Add(entity);
             }
@@ -289,64 +275,23 @@ public class Unit : Entity {
         return distanceToA.CompareTo(distanceToB);
     }
 
-    public override void LoadVariables()
+    public override void SetCurrentVariables()
     {
-        base.LoadVariables();
+        base.SetCurrentVariables();
 
-        totBaseDamage.integer = actBaseDamage;
-        totBaseDamage.maxInt = actBaseDamageMax;
-        totBaseDamage.minInt = actBaseDamageMin;
-        totBaseDamage.isLocked = actBaseDamageLocked;
-
-        totTroopDamage.integer = actTroopDamage;
-        totTroopDamage.maxInt = actTroopDamageMax;
-        totTroopDamage.minInt = actTroopDamageMin;
-        totTroopDamage.isLocked = actTroopDamageLocked;
-
-        totCoreDamage.integer = actCoreDamage;
-        totCoreDamage.maxInt = actCoreDamageMax;
-        totCoreDamage.minInt = actCoreDamageMin;
-        totCoreDamage.isLocked = actCoreDamageLocked;
-
-        totChestDamage.integer = actChestDamage;
-        totChestDamage.maxInt = actChestDamageMax;
-        totChestDamage.minInt = actChestDamageMin;
-        totChestDamage.isLocked = actCoreDamageLocked;
-
-        totDirectDamage.integer = actDirectDamage;
-        totDirectDamage.maxInt = actDirectDamageMax;
-        totDirectDamage.minInt = actDirectDamageMin;
-        totDirectDamage.isLocked = actDirectDamageLocked;
-
-        totSplashDamage.integer = actSplashDamage;
-        totSplashDamage.maxInt = actSplashDamageMax;
-        totSplashDamage.minInt = actSplashDamageMin;
-        totSplashDamage.isLocked = actSplashDamageLocked;
-
-        totCooldown.integer = actCooldown;
-        totCooldown.maxInt = actCooldownMax;
-        totCooldown.minInt = actCooldownMin;
-        totCooldown.isLocked = actCooldownLocked;
-
-        totChargeTime.integer = actChargeTime;
-        totChargeTime.maxInt = actChargeTimeMax;
-        totChargeTime.minInt = actChargeTimeMin;
-        totChargeTime.isLocked = actChargeTimeLocked;
-
-        totSplashRadius.integer = actSplashRadius;
-        totSplashRadius.maxInt = actSplashRadiusMax;
-        totSplashRadius.minInt = actSplashRadiusMin;
-        totSplashRadius.isLocked = actSplashRadiusLocked;
-
-        totRange.integer = actRange;
-        totRange.maxInt = actRangeMax;
-        totRange.minInt = actRangeMin;
-        totRange.isLocked = actRangeLocked;
-
-        totMoveSpeed.integer = actMoveSpeed;
-        totMoveSpeed.maxInt = actMoveSpeedMax;
-        totMoveSpeed.minInt = actMoveSpeedMin;
-        totMoveSpeed.isLocked = actMoveSpeedLocked;
+        curBaseDamage = actBaseDamage;
+        curTroopDamage = actTroopDamage;
+        curCoreDamage = actCoreDamage;
+        curChestDamage = actChestDamage;
+        curDirectDamage = actDirectDamage;
+        curSplashDamage = actSplashDamage;
+        curCooldown = actCooldown;
+        curChargeTime = actChargeTime;
+        curSplashRadius = actSplashRadius;
+        curRange = actRange;
+        curMoveSpeed = actMoveSpeed;
+        curSalvo = actSalvo;
+        curCharges = actCharges;
     }
 
     /*
@@ -432,7 +377,7 @@ public class Unit : Entity {
 
     void AttackState()
     {
-        
+        UseAttack();
     }
 
     void ExitAttackState()
@@ -458,5 +403,30 @@ public class Unit : Entity {
 
     }
     #endregion
+
+    void UseAttack()
+    {
+        if(timeStamp <= Time.time)
+        {
+            Debug.Log("Use the ability!");
+            timeStamp = Time.time + curCooldown;
+
+            //Attack functionality happens here
+            //curBaseDamage
+            //curTroopDamage
+            //curCoreDamage
+            //curChestDamage
+            //curDirectDamage
+            //curSplashDamage
+            //curCooldown
+            //curChargeTime
+            //curSplashRadius
+            //curRange
+            //curMoveSpeed
+            //curSalvo
+            //curCharges
+
+        }
+    }
 
 }

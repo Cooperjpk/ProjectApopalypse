@@ -74,9 +74,20 @@ public class DataReader : MonoBehaviour
             }
             else if (fieldType == typeof(Unit.AttackType))
             {
-                //Debug.Log("Holla, we're here.");
                 Unit.AttackType attackType = (Unit.AttackType)System.Enum.Parse( typeof( Unit.AttackType ), unitStrings[i]);
                 fieldInfo.SetValue(unit, attackType);
+                //Debug.Log(unitKey[i].ToString() + " set to " + fieldInfo.GetValue(unit));
+            }
+            else if (fieldType == typeof(Unit.MoveType))
+            {
+                Unit.MoveType moveType = (Unit.MoveType)System.Enum.Parse(typeof(Unit.MoveType), unitStrings[i]);
+                fieldInfo.SetValue(unit, moveType);
+                //Debug.Log(unitKey[i].ToString() + " set to " + fieldInfo.GetValue(unit));
+            }
+            else if (fieldType == typeof(Unit.Rank))
+            {
+                Unit.Rank rank = (Unit.Rank)System.Enum.Parse(typeof(Unit.Rank), unitStrings[i]);
+                fieldInfo.SetValue(unit, rank);
                 //Debug.Log(unitKey[i].ToString() + " set to " + fieldInfo.GetValue(unit));
             }
             else
@@ -102,6 +113,9 @@ public class DataReader : MonoBehaviour
         {
             AddPassiveToUnit(unit, unit.passive4);
         }
+
+        //Now that the unit is pretty much setup, load and set the variables.
+        unit.SetCurrentVariables();
     }
 
     void AddPassiveToUnit(Unit currentUnit, string passiveName)
