@@ -36,12 +36,12 @@ public class Unit : Entity
     }
     public SplashType splashType;
 
-    public enum AttackOrigin
+    public enum SplashOrigin
     {
         Self,
         Targets
     }
-    public AttackOrigin attackOrigin;
+    public SplashOrigin splashOrigin;
 
     float cooldownStamp;
     float chargeStamp;
@@ -150,8 +150,17 @@ public class Unit : Entity
     NavMeshAgent navMeshAgent;
     int stoppingDistance = 2;
     static int meleeCutOff = 2;
+    int directDamage;
+    int totTargets = 1;
 
     int myLayer;
+    int enemyLayer;
+    LayerMask layerMask;
+
+    static int maxLineDistance = 999;
+    //Vector3 attackPosition;
+    public bool targetAllies = false;
+    public bool targetEnemies = true;
 
     //Called every time a State is entered
     void EnterState(States state)
@@ -171,6 +180,11 @@ public class Unit : Entity
             case States.Attack:
                 {
                     EnterAttackState();
+                    break;
+                }
+            case States.Death:
+                {
+                    EnterDeathState();
                     break;
                 }
         }
@@ -196,6 +210,11 @@ public class Unit : Entity
                     AttackState();
                     break;
                 }
+            case States.Death:
+                {
+                    DeathState();
+                    break;
+                }
         }
     }
 
@@ -219,6 +238,11 @@ public class Unit : Entity
                     ExitAttackState();
                     break;
                 }
+            case States.Death:
+                {
+                    ExitDeathState();
+                    break;
+                }
         }
     }
 
@@ -230,12 +254,12 @@ public class Unit : Entity
             return States.Death;
         }
         //If the unit can attack, is in range and is fully charged, then attack.
-        else if (canAttack && curRange >= Vector3.Distance(targets[0].transform.position, transform.position) && chargeStamp <= Time.time)
+        else if (canAttack && targets[0].gameObject.activeSelf && curRange >= Vector3.Distance(targets[0].transform.position, transform.position) && chargeStamp <= Time.time)
         {
             return States.Attack;
         }
         //If the unit is mobile, it should move.
-        else if (canMove)
+        else if (canMove && targets[0].gameObject.activeSelf)
         {
             return States.Move;
         }
@@ -249,6 +273,15 @@ public class Unit : Entity
     void Start()
     {
         myLayer = gameObject.layer;
+        if (myLayer == 8)
+        {
+            enemyLayer = 9;
+        }
+        else if (myLayer == 9)
+        {
+            enemyLayer = 8;
+
+        }
 
         navMeshAgent = GetComponent<NavMeshAgent>();
         navMeshAgent.stoppingDistance = stoppingDistance;
@@ -259,6 +292,8 @@ public class Unit : Entity
 
         //Invoke the function that runs the behaviour for entering the intial currentState
         Invoke("Enter" + currentState.ToString() + "State", 0);
+
+        SetCurrentVariables();
 
         //Decide whether the unit is melee or ranged depending on their range and then lock their range in.
         if (actRange <= meleeCutOff)
@@ -300,18 +335,56 @@ public class Unit : Entity
         List<Entity> potentialTargets = new List<Entity>();
         foreach (Entity entity in entities)
         {
-            if (entity.gameObject.layer != myLayer)
+            if (entity.gameObject.layer != myLayer && entity.gameObject.activeSelf)
             {
                 potentialTargets.Add(entity);
             }
         }
-        return potentialTargets;
+
+        if (potentialTargets != null)
+        {
+            return potentialTargets;
+        }
+        else
+        {
+            Debug.Log("No existing targets.");
+            return null;
+        }
+    }
+
+    List<Entity> GetAllEntitiesInRange(Entity[] entities)
+    {
+        List<Entity> potentialTargets = new List<Entity>();
+        foreach (Entity entity in entities)
+        {
+            if (entity.gameObject.layer != myLayer && curRange >= Vector3.Distance(entity.transform.position, transform.position))
+            {
+                potentialTargets.Add(entity);
+            }
+        }
+
+        if (potentialTargets != null)
+        {
+            return potentialTargets;
+        }
+        else
+        {
+            Debug.Log("No targets are in range.");
+            return null;
+        }
     }
 
     int ByDistance(Entity entityA, Entity entityB)
     {
         float distanceToA = Vector3.Distance(transform.position, entityA.transform.position);
         float distanceToB = Vector3.Distance(transform.position, entityB.transform.position);
+        return distanceToA.CompareTo(distanceToB);
+    }
+
+    int ByColliderDistance(Collider colA, Collider colB)
+    {
+        float distanceToA = Vector3.Distance(transform.position, colA.transform.position);
+        float distanceToB = Vector3.Distance(transform.position, colB.transform.position);
         return distanceToA.CompareTo(distanceToB);
     }
 
@@ -332,44 +405,8 @@ public class Unit : Entity
         curMoveSpeed = actMoveSpeed;
         curSalvo = actSalvo;
         curCharges = actCharges;
+        curTargets = actTargets;
     }
-
-    /*
-    //https://forum.unity.com/threads/clean-est-way-to-find-nearest-object-of-many-c.44315/
-    Transform GetClosestTarget(Entity[] targets)
-    {
-        /*
-        Transform bestTarget = null;
-        float closestDistance = Mathf.Infinity;
-        Vector3 currentPosition = transform.position;
-
-        foreach (Entity potentialTarget in targets)
-        {
-            Vector3 directionToTarget = potentialTarget.transform.position - currentPosition;
-            float distanceToTarget = directionToTarget.sqrMagnitude;
-            if (distanceToTarget < closestDistance)
-            {
-                closestDistance = distanceToTarget;
-                bestTarget = potentialTarget.transform;
-            }   
-        }
-        return bestTarget;
-
-         function ByDistance(a : GameObject, b : GameObject) : int
- {
-     var dstToA = Vector3.Distance(transform.position, a.transform.position);
-     var dstToB = Vector3.Distance(transform.position, b.transform.position);
-     return dstToA.CompareTo(dstToB);
- }
-        
-
-        Entity[] entityArray = FindObjectsOfType<Entity>();
-        List<Entity> targets = new List<Entity>();
-
-        entities.Sort(ByDistance);
-
-    }
-*/
 
     #region Idle
     void EnterIdleState()
@@ -397,15 +434,12 @@ public class Unit : Entity
 
     void MoveState()
     {
-        if (targets[0] != null)
-        {
-            navMeshAgent.SetDestination(targets[0].transform.position);
-        }
+        navMeshAgent.SetDestination(targets[0].transform.position);
     }
 
     void ExitMoveState()
     {
-
+        navMeshAgent.SetDestination(transform.position);
     }
     #endregion
 
@@ -429,7 +463,8 @@ public class Unit : Entity
     #region Death
     void EnterDeathState()
     {
-
+        Debug.Log(gameObject.name + " has died :(");
+        gameObject.SetActive(false);
     }
 
     void DeathState()
@@ -448,59 +483,247 @@ public class Unit : Entity
     {
         if (cooldownStamp <= Time.time)
         {
-            Debug.Log("Use the ability!");
-
             //Reset the cooldown.
             cooldownStamp = Time.time + curCooldown;
 
             //Reset the charge time.
             chargeStamp = Time.time + curChargeTime;
 
-            //RELEASE ATTACKS AT salvoRate FOR SALVO NUMBER
-            for (int i = 0; i > curSalvo; i++)
+            //Invoke the attack at salvoRate, curSalvo number of times.
+            for (int i = 0; i < curSalvo; i++)
             {
-                AttackFunctionality();
+                Invoke("AttackFunctionality", i * salvoRate);
             }
-
-            //ATTACK
-            //If direct, apply damage and effects to target(s)
-            //If splash, create a raycast line or other shape depending on the mode that was selected.
-            //Define the location, direction and size of the shape.
-            //When things are hit, check their tag and then apply damage and effects.
-
-            //Attack functionality happens here
-            //curBaseDamage
-            //curTroopDamage
-            //curCoreDamage
-            //curChestDamage
-            //curDirectDamage
-            //curSplashDamage
-            //curCooldown
-            //curChargeTime
-            //curSplashRadius
-            //curRange
-            //curMoveSpeed
-            //curSalvo
-            //curCharges
-
         }
     }
 
-    void AttackFunctionality()
+    public void AttackFunctionality()
     {
+        //Find out how many targets to apply the attack to.
+        if (curTargets <= targets.Count)
+        {
+            totTargets = curTargets;
+        }
+        else if (targets.Count < curTargets)
+        {
+            totTargets = targets.Count;
+        }
+
+        //Just in case targets is 0, set targets to 1.
+        if(totTargets <= 0)
+        {
+            totTargets = 1;
+        }
+
         //If the unit has direct damage, deal that damage to targets[] (curTargets).
         if (curDirectDamage > 0)
         {
-            for (int i = 0; i > curTargets; i++)
+            for (int i = 0; i < totTargets; i++)
             {
-                targets[i].ChangeHealth(curDirectDamage + curBaseDamage, DamageType.Direct, gameObject.tag);
+                targets[i].ChangeHealth(CalculateDamage(targets[i].gameObject.tag,DamageType.Direct), DamageType.Direct, gameObject.tag);
             }
         }
 
-        if (curSplashRadius > 0)
+        //If splash, create a raycast line or other shape depending on the mode that was selected.
+        if (curSplashRadius > 0 && splashOrigin == SplashOrigin.Self)
+        {
+            //Sets the layer mask to only target the layers that enemies or allies are on.
+            if (targetAllies && targetEnemies)
+            {
+                layerMask = LayerMask.GetMask(LayerMask.LayerToName(myLayer), LayerMask.LayerToName(enemyLayer));
+            }
+            else if (targetAllies && !targetEnemies)
+            {
+                layerMask = LayerMask.GetMask(LayerMask.LayerToName(myLayer));
+            }
+            else if (targetEnemies && !targetAllies)
+            {
+                layerMask = LayerMask.GetMask(LayerMask.LayerToName(enemyLayer));
+            }
+            else
+            {
+                Debug.LogWarning("There was a problem assembling the layer mask because allies and enemie were both not targetted.");
+            }
+
+            switch (splashType)
+            {
+                default:
+                    {
+                        Debug.LogWarning("The splash type has not been specified.");
+                        break;
+                    }
+                case (SplashType.Line):
+                    {
+                        RaycastHit hit;
+                        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, maxLineDistance, layerMask))
+                        {
+                            hit.collider.gameObject.GetComponent<Entity>().ChangeHealth(CalculateDamage(hit.collider.gameObject.tag, DamageType.Direct), DamageType.Direct, gameObject.tag);
+                            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.green);
+                        }
+                        else
+                        {
+                            Debug.LogWarning("Nothing was hit in the splash shape.");
+                        }
+                        break;
+                    }
+                case (SplashType.Box):
+                    {
+                        break;
+                    }
+                case (SplashType.Sphere):
+                    {
+                        /*
+                        if (splashOrigin == SplashOrigin.Self)
+                        {
+                            Collider[] colliders = Physics.OverlapSphere(attackPosition,curSplashRadius);
+                        }
+                        else if (splashOrigin == SplashOrigin.Targets)
+                        {
+                            for(int i = 0; i > totTargets; i++)
+                            {
+                                attackPosition = targets[i].transform.position;
+                                Collider[] colliders = Physics.OverlapSphere(attackPosition, curSplashRadius);
+                            }
+                        }
+                        /*
+                        Collider[] hitColliders = Physics.OverlapSphere(center, radius);
+                        int i = 0;
+                        while (i < hitColliders.Length)
+                        {
+                            hitColliders[i].SendMessage("AddDamage");
+                            i++;
+                        }
+                        */
+                        break;
+                    }
+                case (SplashType.Capsule):
+                    {
+                        break;
+                    }
+            }
+        }
+        //If there is splash damage except that it uses all target locations, do damage here.
+        else if(curSplashRadius > 0 && splashOrigin == SplashOrigin.Targets)
         {
 
         }
+        else
+        {
+            Debug.LogWarning("Either targets[0] is null or the splashOrigin is unspecified.");
+        }
+
+        //ATTACK
+        //Define the location, direction and size of the shape.
+        //When things are hit, check their tag and then apply damage and effects.
+
+        //Attack functionality happens here
+        //curTroopDamage
+        //curCoreDamage
+        //curChestDamage
+        //curDirectDamage
+        //curSplashDamage
+        //curCooldown
+        //curChargeTime
+        //curSplashRadius
+        //curRange
+        //curMoveSpeed
+        //curSalvo
+        //curCharges
+
+        //Reset the number of targets.
+        totTargets = 1;
     }
 
+    /*
+    List<Collider> TargetsHit (SplashType type)
+    {
+        //RaycastHit hit;
+        if (type == SplashType.Line)
+        {
+            
+        }
+        else if(type == SplashType.Sphere)
+        {
+            //Collider[] hitColliders = Physics.OverlapSphere(, curSplashRadius);
+        }
+        else if(type == SplashType.Box)
+        {
+
+        }
+        else if(type == SplashType.Capsule)
+        {
+
+        }
+        /*
+        foreach (Collider other in cols)
+        {
+            if (targetCount < targetLimit && targetTags.Contains(other.tag) && targetLayers.Contains(other.gameObject.layer))
+            {
+                targetCount++;
+                other.GetComponent<Unit>().ChangeHealth(-damage);
+            }
+            else if (targetCount >= targetLimit)
+            {
+                Debug.Log("Target count has been surpassed.");
+                break;
+            }
+        }
+        targetCount = 0;
+        }
+        */
+
+    int CalculateDamage(string damageDealer, DamageType damageType)
+    {
+        int damage = 0;
+        int damageFraction = 0;
+
+        switch (damageDealer)
+        {
+            default:
+                {
+                    Debug.Log("damageDealer string was not a recognizable string.");
+                    break;
+                }
+            case "Troop":
+                {
+                    damageFraction += curTroopDamage;
+                    break;
+                }
+            case "Core":
+                {
+                    damageFraction += curCoreDamage;
+                    break;
+                }
+            case "Chest":
+                {
+                    damageFraction += curChestDamage;
+                    break;
+                }
+        }
+
+        switch (damageType)
+        {
+            default:
+                {
+                    Debug.Log("damageType was not a recognizable value.");
+                    break;
+                }
+            case DamageType.Direct:
+                {
+                    damageFraction += curDirectDamage;
+                    break;
+                }
+            case DamageType.Splash:
+                {
+                    damageFraction += curSplashDamage;
+                    break;
+                }
+        }
+
+        float accumulative = damage + damageFraction;
+        float damageMultiplier = damage / accumulative;
+        damageMultiplier += 1;
+        float finalDamage = damage * damageMultiplier;
+        return Mathf.RoundToInt(finalDamage);
+    }
 }

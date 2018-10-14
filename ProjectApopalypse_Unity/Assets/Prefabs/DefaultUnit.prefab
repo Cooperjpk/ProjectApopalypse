@@ -26,7 +26,7 @@ GameObject:
   - component: {fileID: 114740682017336948}
   m_Layer: 8
   m_Name: DefaultUnit
-  m_TagString: Untagged
+  m_TagString: Troop
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -119,97 +119,98 @@ MonoBehaviour:
   rank: 0
   variationName: 
   variation: {fileID: 0}
-  totHealth: {fileID: 0}
   actHealth: 20
   actHealthMax: 0
   actHealthMin: 0
   actHealthLocked: 0
-  totBaseArmor: {fileID: 0}
   actBaseArmor: 20
   actBaseArmorMax: 0
   actBaseArmorMin: 0
   actBaseArmorLocked: 0
-  totTroopArmor: {fileID: 0}
   actTroopArmor: 20
   actTroopArmorMax: 0
   actTroopArmorMin: 0
   actTroopArmorLocked: 0
-  totStructureArmor: {fileID: 0}
   actStructureArmor: 20
   actStructureArmorMax: 0
   actStructureArmorMin: 0
   actStructureArmorLocked: 0
-  totDirectArmor: {fileID: 0}
   actDirectArmor: 20
   actDirectArmorMax: 0
   actDirectArmorMin: 0
   actDirectArmorLocked: 0
-  totSplashArmor: {fileID: 0}
   actSplashArmor: 20
   actSplashArmorMax: 0
   actSplashArmorMin: 0
   actSplashArmorLocked: 0
-  isAlive: 0
+  isAlive: 1
   isInvincible: 0
   currentState: 0
   canMove: 1
   canAttack: 0
-  attackType: 0
-  totBaseDamage: {fileID: 0}
+  splashType: 0
+  attackOrigin: 0
+  salvoRate: 0
+  passive1: 
+  passive2: 
+  passive3: 
+  passive4: 
   actBaseDamage: 0
   actBaseDamageMax: 0
   actBaseDamageMin: 0
   actBaseDamageLocked: 0
-  totTroopDamage: {fileID: 0}
   actTroopDamage: 0
   actTroopDamageMax: 0
   actTroopDamageMin: 0
   actTroopDamageLocked: 0
-  totCoreDamage: {fileID: 0}
   actCoreDamage: 0
   actCoreDamageMax: 0
   actCoreDamageMin: 0
   actCoreDamageLocked: 0
-  totChestDamage: {fileID: 0}
   actChestDamage: 0
   actChestDamageMax: 0
   actChestDamageMin: 0
   actChestDamageLocked: 0
-  totDirectDamage: {fileID: 0}
   actDirectDamage: 0
   actDirectDamageMax: 0
   actDirectDamageMin: 0
   actDirectDamageLocked: 0
-  totSplashDamage: {fileID: 0}
   actSplashDamage: 0
   actSplashDamageMax: 0
   actSplashDamageMin: 0
   actSplashDamageLocked: 0
-  totCooldown: {fileID: 0}
   actCooldown: 0
   actCooldownMax: 0
   actCooldownMin: 0
   actCooldownLocked: 0
-  totChargeTime: {fileID: 0}
   actChargeTime: 0
   actChargeTimeMax: 0
   actChargeTimeMin: 0
   actChargeTimeLocked: 0
-  totSplashRadius: {fileID: 0}
   actSplashRadius: 0
   actSplashRadiusMax: 0
   actSplashRadiusMin: 0
   actSplashRadiusLocked: 0
-  totRange: {fileID: 0}
   actRange: 0
   actRangeMax: 0
   actRangeMin: 0
   actRangeLocked: 0
-  totMoveSpeed: {fileID: 0}
   actMoveSpeed: 0
   actMoveSpeedMax: 0
   actMoveSpeedMin: 0
   actMoveSpeedLocked: 0
+  actCharges: 0
+  actChargesMax: 0
+  actChargesMin: 0
+  actChargesLocked: 0
+  actSalvo: 0
+  actSalvoMax: 0
+  actSalvoMin: 0
+  actSalvoLocked: 0
+  actTargets: 0
+  actTargetsMax: 0
+  actTargetsMin: 0
+  actTargetsLocked: 0
   moveType: 0
   targets: []
 --- !u!195 &195995870123340446

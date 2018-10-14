@@ -101,11 +101,13 @@ public class Entity : MonoBehaviour
         {
             case DamageType.Direct:
                 {
+                    //Debug.Log("Direct damage being dealt.");
                     damageFraction += curDirectArmor;
                     break;
                 }
             case DamageType.Splash:
                 {
+                    //Debug.Log("Splash damage being dealt.");
                     damageFraction += curSplashArmor;
                     break;
                 }
@@ -115,23 +117,29 @@ public class Entity : MonoBehaviour
         {
             default:
                 {
-                    Debug.Log("The damageSource did not have a recorded tag");
+                    Debug.LogWarning("The damageSource did not have a recorded tag");
                     break;
                 }
             case "Troop":
                 {
+                    //Debug.Log("Troop damage being dealt.");
                     damageFraction += curTroopArmor;
                     break;
                 }
             case "Structure":
                 {
+                    //Debug.Log("Troop damage being dealt.");
                     damageFraction += curStructureArmor;
                     break;
                 }
         }
 
-        float damageMultiplier = damage / (damage + damageFraction + curBaseArmor);
+        //Debug.Log(damage);
+        float accumulative = damage + damageFraction + curBaseArmor;
+        float damageMultiplier = damage / accumulative;
         float finalDamage = damage * damageMultiplier;
+
+        //Debug.Log("Final damage is " + Mathf.RoundToInt(finalDamage));
         curHealth -= Mathf.RoundToInt(finalDamage);
 
         if (curHealth <= 0)
@@ -143,7 +151,6 @@ public class Entity : MonoBehaviour
         {
             curHealth = actHealth;
         }
-
         damageFraction = 0;
     }
 

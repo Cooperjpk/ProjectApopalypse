@@ -77,10 +77,10 @@ public class DataReader : MonoBehaviour
                 fieldInfo.SetValue(unit, bool.Parse(unitStrings[i]));
                 //Debug.Log(unitKey[i].ToString() + " set to " + fieldInfo.GetValue(unit));
             }
-            else if (fieldType == typeof(Unit.AttackOrigin))
+            else if (fieldType == typeof(Unit.SplashOrigin))
             {
-                Unit.AttackOrigin attackOrigin = (Unit.AttackOrigin)System.Enum.Parse( typeof( Unit.AttackOrigin ), unitStrings[i]);
-                fieldInfo.SetValue(unit, attackOrigin);
+                Unit.SplashOrigin splashOrigin = (Unit.SplashOrigin)System.Enum.Parse( typeof( Unit.SplashOrigin ), unitStrings[i]);
+                fieldInfo.SetValue(unit, splashOrigin);
                 //Debug.Log(unitKey[i].ToString() + " set to " + fieldInfo.GetValue(unit));
             }
             else if (fieldType == typeof(Unit.SplashType))
