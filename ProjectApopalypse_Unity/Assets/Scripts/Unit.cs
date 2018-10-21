@@ -554,15 +554,12 @@ public class Unit : Entity
                     }
                 case (SplashType.Line):
                     {
-                        RaycastHit hit;
-                        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, maxLineDistance, layerMask))
+                        RaycastHit[] hits;
+                        hits = Physics.RaycastAll(transform.position, transform.TransformDirection(Vector3.forward), maxLineDistance, layerMask);
+
+                        for(int i = 0; i < hits.Length; i++)
                         {
-                            hit.collider.gameObject.GetComponent<Entity>().ChangeHealth(CalculateDamage(hit.collider.gameObject.tag, DamageType.Direct), DamageType.Direct, gameObject.tag);
-                            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.green);
-                        }
-                        else
-                        {
-                            Debug.LogWarning("Nothing was hit in the splash shape.");
+                            hits[i].collider.gameObject.GetComponent<Entity>().ChangeHealth(CalculateDamage(hits[i].collider.gameObject.tag, DamageType.Direct), DamageType.Direct, gameObject.tag);
                         }
                         break;
                     }
