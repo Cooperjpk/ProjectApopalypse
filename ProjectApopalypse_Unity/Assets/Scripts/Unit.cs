@@ -560,11 +560,20 @@ public class Unit : Entity
                         for(int i = 0; i < hits.Length; i++)
                         {
                             hits[i].collider.gameObject.GetComponent<Entity>().ChangeHealth(CalculateDamage(hits[i].collider.gameObject.tag, DamageType.Direct), DamageType.Direct, gameObject.tag);
+                            //Debug.DrawRay(transform.position, forward, Color.green);
                         }
                         break;
                     }
                 case (SplashType.Box):
                     {
+                        //Collider[] hits;
+                        //hits = Physics.OverlapBox();
+
+                        for (int i = 0; i < hits.Length; i++)
+                        {
+                            //hits[i].collider.gameObject.GetComponent<Entity>().ChangeHealth(CalculateDamage(hits[i].collider.gameObject.tag, DamageType.Direct), DamageType.Direct, gameObject.tag);
+                            //Debug.DrawRay(transform.position, forward, Color.green);
+                        }
                         break;
                     }
                 case (SplashType.Sphere):
