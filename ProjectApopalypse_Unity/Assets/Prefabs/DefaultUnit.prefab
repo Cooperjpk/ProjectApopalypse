@@ -24,7 +24,7 @@ GameObject:
   - component: {fileID: 65689147508811392}
   - component: {fileID: 195995870123340446}
   - component: {fileID: 114740682017336948}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: DefaultUnit
   m_TagString: Troop
   m_Icon: {fileID: 0}
@@ -38,7 +38,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1457683719879162}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.09, y: 0, z: -4}
+  m_LocalPosition: {x: -3.94, y: 0, z: 3.98}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -119,100 +119,102 @@ MonoBehaviour:
   rank: 0
   variationName: 
   variation: {fileID: 0}
-  actHealth: 20
-  actHealthMax: 0
-  actHealthMin: 0
+  actHealth: 100
+  actHealthMax: 999
+  actHealthMin: 1
   actHealthLocked: 0
-  actBaseArmor: 20
-  actBaseArmorMax: 0
-  actBaseArmorMin: 0
+  actBaseArmor: 0
+  actBaseArmorMax: 999
+  actBaseArmorMin: 1
   actBaseArmorLocked: 0
-  actTroopArmor: 20
-  actTroopArmorMax: 0
-  actTroopArmorMin: 0
+  actTroopArmor: 0
+  actTroopArmorMax: 999
+  actTroopArmorMin: 1
   actTroopArmorLocked: 0
-  actStructureArmor: 20
-  actStructureArmorMax: 0
-  actStructureArmorMin: 0
+  actStructureArmor: 0
+  actStructureArmorMax: 999
+  actStructureArmorMin: 1
   actStructureArmorLocked: 0
-  actDirectArmor: 20
-  actDirectArmorMax: 0
-  actDirectArmorMin: 0
+  actDirectArmor: 0
+  actDirectArmorMax: 999
+  actDirectArmorMin: 1
   actDirectArmorLocked: 0
-  actSplashArmor: 20
-  actSplashArmorMax: 0
-  actSplashArmorMin: 0
+  actSplashArmor: 0
+  actSplashArmorMax: 999
+  actSplashArmorMin: 1
   actSplashArmorLocked: 0
   isAlive: 1
   isInvincible: 0
   currentState: 0
   canMove: 1
-  canAttack: 0
+  canAttack: 1
   splashType: 0
-  attackOrigin: 0
-  salvoRate: 0
+  splashOrigin: 0
+  salvoRate: 0.2
   passive1: 
   passive2: 
   passive3: 
   passive4: 
-  actBaseDamage: 0
-  actBaseDamageMax: 0
-  actBaseDamageMin: 0
+  actBaseDamage: 1
+  actBaseDamageMax: 999
+  actBaseDamageMin: 1
   actBaseDamageLocked: 0
   actTroopDamage: 0
-  actTroopDamageMax: 0
-  actTroopDamageMin: 0
+  actTroopDamageMax: 999
+  actTroopDamageMin: 1
   actTroopDamageLocked: 0
   actCoreDamage: 0
-  actCoreDamageMax: 0
-  actCoreDamageMin: 0
+  actCoreDamageMax: 999
+  actCoreDamageMin: 1
   actCoreDamageLocked: 0
   actChestDamage: 0
-  actChestDamageMax: 0
-  actChestDamageMin: 0
+  actChestDamageMax: 999
+  actChestDamageMin: 1
   actChestDamageLocked: 0
   actDirectDamage: 0
-  actDirectDamageMax: 0
-  actDirectDamageMin: 0
+  actDirectDamageMax: 999
+  actDirectDamageMin: 1
   actDirectDamageLocked: 0
-  actSplashDamage: 0
-  actSplashDamageMax: 0
-  actSplashDamageMin: 0
+  actSplashDamage: 1
+  actSplashDamageMax: 999
+  actSplashDamageMin: 1
   actSplashDamageLocked: 0
-  actCooldown: 0
-  actCooldownMax: 0
+  actCooldown: 1
+  actCooldownMax: 999
   actCooldownMin: 0
   actCooldownLocked: 0
   actChargeTime: 0
-  actChargeTimeMax: 0
+  actChargeTimeMax: 999
   actChargeTimeMin: 0
   actChargeTimeLocked: 0
-  actSplashRadius: 0
-  actSplashRadiusMax: 0
-  actSplashRadiusMin: 0
+  actSplashRadius: 3
+  actSplashRadiusMax: 999
+  actSplashRadiusMin: 1
   actSplashRadiusLocked: 0
-  actRange: 0
-  actRangeMax: 0
-  actRangeMin: 0
+  actRange: 3
+  actRangeMax: 999
+  actRangeMin: 1
   actRangeLocked: 0
-  actMoveSpeed: 0
-  actMoveSpeedMax: 0
-  actMoveSpeedMin: 0
+  actMoveSpeed: 5
+  actMoveSpeedMax: 999
+  actMoveSpeedMin: 1
   actMoveSpeedLocked: 0
-  actCharges: 0
-  actChargesMax: 0
-  actChargesMin: 0
-  actChargesLocked: 0
-  actSalvo: 0
-  actSalvoMax: 0
-  actSalvoMin: 0
-  actSalvoLocked: 0
-  actTargets: 0
-  actTargetsMax: 0
-  actTargetsMin: 0
-  actTargetsLocked: 0
+  actCharges: 1
+  actChargesMax: 999
+  actChargesMin: 1
+  actChargesLocked: 1
+  actSalvo: 1
+  actSalvoMax: 999
+  actSalvoMin: 1
+  actSalvoLocked: 1
+  actTargets: 1
+  actTargetsMax: 10
+  actTargetsMin: 1
+  actTargetsLocked: 1
   moveType: 0
   targets: []
+  targetAllies: 0
+  targetEnemies: 1
 --- !u!195 &195995870123340446
 NavMeshAgent:
   m_ObjectHideFlags: 1

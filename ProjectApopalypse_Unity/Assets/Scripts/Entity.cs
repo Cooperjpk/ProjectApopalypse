@@ -134,7 +134,7 @@ public class Entity : MonoBehaviour
                 }
         }
 
-        //Debug.Log(damage);
+        //Debug.Log(damageFraction);
         float accumulative = damage + damageFraction + curBaseArmor;
         float damageMultiplier = damage / accumulative;
         float finalDamage = damage * damageMultiplier;

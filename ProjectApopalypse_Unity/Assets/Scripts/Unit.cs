@@ -31,8 +31,7 @@ public class Unit : Entity
     {
         Line,
         Sphere,
-        Box,
-        Capsule
+        None
     }
     public SplashType splashType;
 
@@ -89,34 +88,34 @@ public class Unit : Entity
     public int actSplashDamageMin;
     public bool actSplashDamageLocked;
 
-    int curCooldown;
-    public int actCooldown;
-    public int actCooldownMax;
-    public int actCooldownMin;
+    float curCooldown;
+    public float actCooldown;
+    public float actCooldownMax;
+    public float actCooldownMin;
     public bool actCooldownLocked;
 
-    int curChargeTime;
-    public int actChargeTime;
-    public int actChargeTimeMax;
-    public int actChargeTimeMin;
+    float curChargeTime;
+    public float actChargeTime;
+    public float actChargeTimeMax;
+    public float actChargeTimeMin;
     public bool actChargeTimeLocked;
 
-    int curSplashRadius;
-    public int actSplashRadius;
-    public int actSplashRadiusMax;
-    public int actSplashRadiusMin;
+    float curSplashRadius;
+    public float actSplashRadius;
+    public float actSplashRadiusMax;
+    public float actSplashRadiusMin;
     public bool actSplashRadiusLocked;
 
-    int curRange;
-    public int actRange;
-    public int actRangeMax;
-    public int actRangeMin;
+    float curRange;
+    public float actRange;
+    public float actRangeMax;
+    public float actRangeMin;
     public bool actRangeLocked;
 
-    int curMoveSpeed;
-    public int actMoveSpeed;
-    public int actMoveSpeedMax;
-    public int actMoveSpeedMin;
+    float curMoveSpeed;
+    public float actMoveSpeed;
+    public float actMoveSpeedMax;
+    public float actMoveSpeedMin;
     public bool actMoveSpeedLocked;
 
     int curCharges;
@@ -492,6 +491,7 @@ public class Unit : Entity
             //Invoke the attack at salvoRate, curSalvo number of times.
             for (int i = 0; i < curSalvo; i++)
             {
+                //Debug.Log("Attack happening");
                 Invoke("AttackFunctionality", i * salvoRate);
             }
         }
@@ -510,7 +510,7 @@ public class Unit : Entity
         }
 
         //Just in case targets is 0, set targets to 1.
-        if(totTargets <= 0)
+        if (totTargets <= 0)
         {
             totTargets = 1;
         }
@@ -520,12 +520,12 @@ public class Unit : Entity
         {
             for (int i = 0; i < totTargets; i++)
             {
-                targets[i].ChangeHealth(CalculateDamage(targets[i].gameObject.tag,DamageType.Direct), DamageType.Direct, gameObject.tag);
+                targets[i].ChangeHealth(CalculateDamage(targets[i].gameObject.tag, DamageType.Direct), DamageType.Direct, gameObject.tag);
             }
         }
 
         //If splash, create a raycast line or other shape depending on the mode that was selected.
-        if (curSplashRadius > 0 && splashOrigin == SplashOrigin.Self)
+        if (curSplashRadius > 0 && curSplashDamage > 0)
         {
             //Sets the layer mask to only target the layers that enemies or allies are on.
             if (targetAllies && targetEnemies)
@@ -542,7 +542,7 @@ public class Unit : Entity
             }
             else
             {
-                Debug.LogWarning("There was a problem assembling the layer mask because allies and enemie were both not targetted.");
+                Debug.LogWarning("There was a problem assembling the layer mask because allies and enemies were both not targetted.");
             }
 
             switch (splashType)
@@ -554,69 +554,78 @@ public class Unit : Entity
                     }
                 case (SplashType.Line):
                     {
-                        RaycastHit[] hits;
-                        hits = Physics.RaycastAll(transform.position, transform.TransformDirection(Vector3.forward), maxLineDistance, layerMask);
-
-                        for(int i = 0; i < hits.Length; i++)
+                        Debug.Log("Line splash.");
+                        for (int j = 0; j < totTargets; j++)
                         {
-                            hits[i].collider.gameObject.GetComponent<Entity>().ChangeHealth(CalculateDamage(hits[i].collider.gameObject.tag, DamageType.Direct), DamageType.Direct, gameObject.tag);
-                            //Debug.DrawRay(transform.position, forward, Color.green);
-                        }
-                        break;
-                    }
-                case (SplashType.Box):
-                    {
-                        //Collider[] hits;
-                        //hits = Physics.OverlapBox();
+                            var heading = targets[j].transform.position - transform.position;
+                            var distance = heading.magnitude;
+                            var direction = heading / distance;
 
-                        for (int i = 0; i < hits.Length; i++)
-                        {
-                            //hits[i].collider.gameObject.GetComponent<Entity>().ChangeHealth(CalculateDamage(hits[i].collider.gameObject.tag, DamageType.Direct), DamageType.Direct, gameObject.tag);
-                            //Debug.DrawRay(transform.position, forward, Color.green);
+                            RaycastHit[] hits;
+                            hits = Physics.RaycastAll(transform.position, direction, maxLineDistance, layerMask);
+                            Debug.DrawRay(transform.position, direction * maxLineDistance, Color.green);
+
+                            for (int i = 0; i < hits.Length; i++)
+                            {
+                                hits[i].collider.gameObject.GetComponent<Entity>().ChangeHealth(CalculateDamage(hits[i].collider.gameObject.tag, DamageType.Splash), DamageType.Splash, gameObject.tag);
+                            }
                         }
                         break;
                     }
                 case (SplashType.Sphere):
                     {
-                        /*
+                        Debug.Log("Sphere splash.");
+                        Vector3 origin;
                         if (splashOrigin == SplashOrigin.Self)
                         {
-                            Collider[] colliders = Physics.OverlapSphere(attackPosition,curSplashRadius);
+                            origin = transform.position;
+
+                            Collider[] selfHits;
+                            selfHits = Physics.OverlapSphere(origin,curSplashRadius);
+
+                            for (int k = 0; k < selfHits.Length; k++)
+                            {
+                                selfHits[k].gameObject.GetComponent<Entity>().ChangeHealth(CalculateDamage(selfHits[k].gameObject.tag, DamageType.Splash), DamageType.Splash, gameObject.tag);
+                                Debug.Log(selfHits[k].gameObject.name + " has been hit for " + CalculateDamage(selfHits[k].gameObject.tag, DamageType.Splash));
+                            }
                         }
                         else if (splashOrigin == SplashOrigin.Targets)
                         {
-                            for(int i = 0; i > totTargets; i++)
+                            for (int j = 0; j < totTargets; j++)
                             {
-                                attackPosition = targets[i].transform.position;
-                                Collider[] colliders = Physics.OverlapSphere(attackPosition, curSplashRadius);
+                                origin = targets[j].transform.position;
+
+                                Collider[] targetHits;
+                                targetHits = Physics.OverlapSphere(origin,curSplashRadius);
+
+                                for(int l = 0; l < targetHits.Length; l++)
+                                {
+                                    targetHits[l].gameObject.GetComponent<Entity>().ChangeHealth(CalculateDamage(targetHits[l].gameObject.tag, DamageType.Splash), DamageType.Splash, gameObject.tag);
+                                    Debug.Log(targetHits[l].gameObject.name + " has been hit for " + CalculateDamage(targetHits[l].gameObject.tag, DamageType.Splash));
+                                }
                             }
                         }
-                        /*
-                        Collider[] hitColliders = Physics.OverlapSphere(center, radius);
-                        int i = 0;
-                        while (i < hitColliders.Length)
-                        {
-                            hitColliders[i].SendMessage("AddDamage");
-                            i++;
-                        }
-                        */
                         break;
                     }
-                case (SplashType.Capsule):
+                case (SplashType.None):
                     {
                         break;
                     }
             }
         }
-        //If there is splash damage except that it uses all target locations, do damage here.
-        else if(curSplashRadius > 0 && splashOrigin == SplashOrigin.Targets)
-        {
 
-        }
-        else
-        {
-            Debug.LogWarning("Either targets[0] is null or the splashOrigin is unspecified.");
-        }
+
+        /*
+            //If there is splash damage except that it uses all target locations, do damage here.
+            else if (curSplashRadius > 0 && splashOrigin == SplashOrigin.Targets)
+            {
+
+            }
+            else
+            {
+                Debug.LogWarning("Either targets[0] is null or the splashOrigin is unspecified.");
+            }
+            */
 
         //ATTACK
         //Define the location, direction and size of the shape.
@@ -678,7 +687,7 @@ public class Unit : Entity
         }
         */
 
-    int CalculateDamage(string damageDealer, DamageType damageType)
+    public int CalculateDamage(string damageDealer, DamageType damageType)
     {
         int damage = 0;
         int damageFraction = 0;
@@ -730,6 +739,10 @@ public class Unit : Entity
         float damageMultiplier = damage / accumulative;
         damageMultiplier += 1;
         float finalDamage = damage * damageMultiplier;
+
+        Debug.Log(finalDamage);
+        //For some reason damage is ending up being 0 when base damage is 1 and splash damage is 1 and everything else is 0.
+
         return Mathf.RoundToInt(finalDamage);
     }
 }

@@ -25,13 +25,19 @@ public class DataReader : MonoBehaviour
     {
         ReadFile("Units");
         ReadFile("Passives");
-        InstantiateUnit("defaultUnit", transform.position, transform.rotation);
+        InstantiateUnit("defaultSplashUnit", transform.position, transform.rotation);
+        InstantiateUnit("defaultSplashUnit", transform.position, transform.rotation);
+        InstantiateUnit("defaultSplashUnit", transform.position, transform.rotation);
+
     }
 
     void InstantiateUnit(string instanceName, Vector3 spawnLocation, Quaternion spawnRotation)
     {
         //Instantiate the unit using the unitDefault and then applying changes.
         Unit unit = Instantiate<Unit>(unitDefault, spawnLocation, spawnRotation) as Unit;
+
+        //Set unit to the player layer.
+        unit.gameObject.layer = 8;
 
         //Search for the correct string array and then declare.
         for (int i = 0; i < unitInstances.Count; i++)
