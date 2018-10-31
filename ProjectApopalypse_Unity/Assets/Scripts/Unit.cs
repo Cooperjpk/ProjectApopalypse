@@ -161,6 +161,13 @@ public class Unit : Entity
     public bool targetAllies = false;
     public bool targetEnemies = true;
 
+    [Header("Particle Effects")]
+    public ParticleSystem effectSplashTarget;
+    public Vector4 effectSplashTargetColor;
+    //public ParticleSystem effectSplashTargetOrigin;
+
+    //Splash Particle Effect Targets Origin
+
     //Called every time a State is entered
     void EnterState(States state)
     {
@@ -602,6 +609,13 @@ public class Unit : Entity
                                 {
                                     targetHits[l].gameObject.GetComponent<Entity>().ChangeHealth(CalculateDamage(targetHits[l].gameObject.tag, DamageType.Splash), DamageType.Splash, gameObject.tag);
                                     Debug.Log(targetHits[l].gameObject.name + " has been hit for " + CalculateDamage(targetHits[l].gameObject.tag, DamageType.Splash));
+                                    //Splash Particle Effect Targets Origin
+                                    var emitParams = new ParticleSystem.EmitParams();
+                                    //This needs to be from a data entry in the sheet that takes in 3 values (I'm thinking RGB).
+                                    //emitParams.startColor = effectSplashTargetColor;
+                                    //This needs to be in accordance with the actual size of the splash radius.
+                                    emitParams.startSize = curSplashRadius;
+                                    effectSplashTarget.Emit(emitParams,1);
                                 }
                             }
                         }
@@ -614,78 +628,9 @@ public class Unit : Entity
             }
         }
 
-
-        /*
-            //If there is splash damage except that it uses all target locations, do damage here.
-            else if (curSplashRadius > 0 && splashOrigin == SplashOrigin.Targets)
-            {
-
-            }
-            else
-            {
-                Debug.LogWarning("Either targets[0] is null or the splashOrigin is unspecified.");
-            }
-            */
-
-        //ATTACK
-        //Define the location, direction and size of the shape.
-        //When things are hit, check their tag and then apply damage and effects.
-
-        //Attack functionality happens here
-        //curTroopDamage
-        //curCoreDamage
-        //curChestDamage
-        //curDirectDamage
-        //curSplashDamage
-        //curCooldown
-        //curChargeTime
-        //curSplashRadius
-        //curRange
-        //curMoveSpeed
-        //curSalvo
-        //curCharges
-
         //Reset the number of targets.
         totTargets = 1;
     }
-
-    /*
-    List<Collider> TargetsHit (SplashType type)
-    {
-        //RaycastHit hit;
-        if (type == SplashType.Line)
-        {
-            
-        }
-        else if(type == SplashType.Sphere)
-        {
-            //Collider[] hitColliders = Physics.OverlapSphere(, curSplashRadius);
-        }
-        else if(type == SplashType.Box)
-        {
-
-        }
-        else if(type == SplashType.Capsule)
-        {
-
-        }
-        /*
-        foreach (Collider other in cols)
-        {
-            if (targetCount < targetLimit && targetTags.Contains(other.tag) && targetLayers.Contains(other.gameObject.layer))
-            {
-                targetCount++;
-                other.GetComponent<Unit>().ChangeHealth(-damage);
-            }
-            else if (targetCount >= targetLimit)
-            {
-                Debug.Log("Target count has been surpassed.");
-                break;
-            }
-        }
-        targetCount = 0;
-        }
-        */
 
     public int CalculateDamage(string damageDealer, DamageType damageType)
     {
