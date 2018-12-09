@@ -31,7 +31,7 @@ namespace BLINDED_AM_ME{
 
 	[RequireComponent(typeof(MeshFilter))]
 	[RequireComponent(typeof(MeshRenderer))]
-	[RequireComponent(typeof(Path_Comp))]
+	[RequireComponent(typeof(PathComp))]
 	public class Spline3D : MonoBehaviour {
 
 
@@ -42,7 +42,7 @@ namespace BLINDED_AM_ME{
 		private float _segment_MinZ;
 		private float _segment_MaxZ;
 
-		private Path_Comp _path;
+		private PathComp _path;
 		private Transform  _helpTransform1;
 		private Transform  _helpTransform2;
 
@@ -98,7 +98,7 @@ namespace BLINDED_AM_ME{
 
 		private void Craft(){
 
-			_path = GetComponent<Path_Comp>();
+			_path = GetComponent<PathComp>();
 			Path_Point pointA = _path.GetPathPoint(0.0f);
 			Path_Point pointB = pointA;
 		

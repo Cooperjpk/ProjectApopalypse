@@ -27,7 +27,6 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -36,23 +35,20 @@ namespace BLINDED_AM_ME{
 
 	[ExecuteInEditMode]
 	[RequireComponent(typeof(ParticleSystem))]
-	[RequireComponent(typeof(Path_Comp))]
+	[RequireComponent(typeof(PathComp))]
 	public class ParticlePathFlow : MonoBehaviour {
 
 		public bool isPathUpdating = false;
 		public bool hasRandomStartingPoints = false;
 
-
 		[Range(0.0f, 5.0f)]
 		public float pathWidth = 0.0f;
 
-
 		private ParticleSystem.Particle[] _particle_array;
-		private ParticleSystem            _particle_system;
-		private Path_Comp 				  _path_comp;
+        private ParticleSystem            _particle_system;
+		private PathComp 				  _path_comp;
 
 		private int _numParticles;
-
 
 	#if UNITY_EDITOR
 		void Reset(){
@@ -62,49 +58,9 @@ namespace BLINDED_AM_ME{
 	
 		void Start(){
 			
-			_path_comp = GetComponent<Path_Comp>();
+			_path_comp = GetComponent<PathComp>();
 			_particle_system = GetComponent<ParticleSystem>();
 			_particle_array = new ParticleSystem.Particle[_particle_system.main.maxParticles];
-
-            //Cooper Code: Adjust the speed so that the particle makes it to the end point.
-
-            //Hey future me... this is past you. I am having trouble, with the directions.   
-
-            if (_particle_array == null)
-            {
-
-                Start();
-                _path_comp.Update_Path();
-
-            }
-            else if (isPathUpdating)
-            {
-
-                _path_comp.Update_Path();
-
-            }
-
-            _numParticles = _particle_system.GetParticles(_particle_array);
-            Debug.Log(_numParticles);
-            int segments = _numParticles - 1;
-
-            //Get the distance from all points.
-            float distance = 0;
-            for(int i = 0; i < segments; i++)
-            {
-                distance += Vector3.Distance(_particle_array[i].position,_particle_array[(i+1)].position);
-                Debug.Log("Distance is " + distance);
-            }
-
-            float currentSpeed = _particle_system.main.startSpeed.Evaluate(0.01f);
-            Debug.Log("Speed is " + currentSpeed);
-
-            float newTime = distance / currentSpeed;
-            Debug.Log("Time is " + newTime);
-
-            var vel = GetComponent<ParticleSystem>().main.startLifetime;
-            vel.constant = newTime;
-            //Cooper Code ends here.
         }
 
 
@@ -124,11 +80,9 @@ namespace BLINDED_AM_ME{
 
             }
 
-
-
             _numParticles = _particle_system.GetParticles(_particle_array);
 
-			if(_numParticles > 0){
+            if (_numParticles > 0){
 
 				for(int i=0; i<_numParticles; i++){
 

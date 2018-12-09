@@ -28,7 +28,7 @@ using System.Collections;
 
 namespace BLINDED_AM_ME{
 
-	[RequireComponent(typeof(Path_Comp))]
+	[RequireComponent(typeof(PathComp))]
 	public class Electricity : MonoBehaviour {
 
 		public float strikeFrequency = 0.5f;
@@ -41,12 +41,12 @@ namespace BLINDED_AM_ME{
 
 		private int       _line_iterator = 0;
 		private float     _strikeTracker = 0.0f;
-		private Path_Comp _pathComp;
+		private PathComp _pathComp;
 
 		void Reset(){
 
-			GetComponent<Path_Comp>().isSmooth = false;
-			GetComponent<Path_Comp>().isCircuit = false;
+			GetComponent<PathComp>().isSmooth = false;
+			GetComponent<PathComp>().isCircuit = false;
 
 		}
 
@@ -60,7 +60,7 @@ namespace BLINDED_AM_ME{
 		// Use this for initialization
 		void Start () {
 
-			_pathComp = GetComponent<Path_Comp>();
+			_pathComp = GetComponent<PathComp>();
 				
 		}
 

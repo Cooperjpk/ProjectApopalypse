@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/BLINDED_AM_ME package/Scenes/Particle_Flow.unity
+- path: Assets/Scenes/Test.unity
   isLoaded: 1
   isActive: 1

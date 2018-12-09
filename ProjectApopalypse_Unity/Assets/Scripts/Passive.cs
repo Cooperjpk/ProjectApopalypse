@@ -4,10 +4,47 @@ using UnityEngine;
 
 public class Passive : MonoBehaviour {
 
-    public string technicalName;
     public string displayName;
     public string description;
-    //Lock functionality should not be driven by passive data, it should be driven by unit data.
     public bool isLocked = false;
-
 }
+
+public interface ISelfDeploy
+{
+    void SelfDeploy();
+}
+
+public interface ISelfAttack
+{
+    void SelfAttack();
+}
+
+public interface ISelfDamaged
+{
+    void SelfDamaged();
+}
+
+public interface ISelfDeath
+{
+    void SelfDeath();
+}
+
+public interface ISelfTarget
+{
+    void SelfTarget();
+}
+
+public interface ISelfStatusEffect
+{
+    void SelfStatusEffect();
+}
+
+/*
+ * AllyDeploy
+ * AllyDamaged
+ * AllyDeath
+ * TargetDeath
+ * TargetStatusEffect
+ * EnemyDamaged
+ * EnemyDeath
+ */ 

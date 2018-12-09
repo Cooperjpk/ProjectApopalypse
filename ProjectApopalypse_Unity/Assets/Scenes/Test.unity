@@ -144,8 +144,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitDefault: {fileID: 114740682017336948, guid: c59629de62a19394db782bdecc15f746,
     type: 2}
-  passiveDefault: {fileID: 114456237120365696, guid: faaf8a0ded9053e44a621d7138e5776d,
-    type: 2}
 --- !u!81 &986793
 AudioListener:
   m_ObjectHideFlags: 0
@@ -341,6 +339,20 @@ Prefab:
       propertyPath: m_AgentTypeID
       value: -334000983
       objectReference: {fileID: 0}
+    - target: {fileID: 1457683719879162, guid: c59629de62a19394db782bdecc15f746, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114740682017336948, guid: c59629de62a19394db782bdecc15f746,
+        type: 2}
+      propertyPath: actBaseDamage
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114740682017336948, guid: c59629de62a19394db782bdecc15f746,
+        type: 2}
+      propertyPath: actSplashDamage
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c59629de62a19394db782bdecc15f746, type: 2}
   m_IsPrefabAsset: 0
@@ -453,10 +465,15 @@ Prefab:
       propertyPath: m_Name
       value: DefaultUnit (1)
       objectReference: {fileID: 0}
-    - target: {fileID: 195995870123340446, guid: c59629de62a19394db782bdecc15f746,
+    - target: {fileID: 114740682017336948, guid: c59629de62a19394db782bdecc15f746,
         type: 2}
-      propertyPath: m_AgentTypeID
-      value: -1372625422
+      propertyPath: actBaseDamage
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114740682017336948, guid: c59629de62a19394db782bdecc15f746,
+        type: 2}
+      propertyPath: actSplashDamage
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c59629de62a19394db782bdecc15f746, type: 2}

@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 65689147508811392}
   - component: {fileID: 195995870123340446}
   - component: {fileID: 114740682017336948}
+  - component: {fileID: 114136835998988282}
   m_Layer: 9
   m_Name: DefaultUnit
   m_TagString: Troop
@@ -98,6 +99,18 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &114136835998988282
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1457683719879162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a52adedf25d8224fb5a4b5c2c6b1ace, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  passives: []
 --- !u!114 &114740682017336948
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -155,6 +168,10 @@ MonoBehaviour:
   passive2: 
   passive3: 
   passive4: 
+  passiveAbility1: {fileID: 0}
+  passiveAbility2: {fileID: 0}
+  passiveAbility3: {fileID: 0}
+  passiveAbility4: {fileID: 0}
   actBaseDamage: 1
   actBaseDamageMax: 999
   actBaseDamageMin: 1
@@ -215,6 +232,10 @@ MonoBehaviour:
   targets: []
   targetAllies: 0
   targetEnemies: 1
+  passiveManager: {fileID: 0}
+  effectImpactTime: 0
+  effectSplashTarget: {fileID: 0}
+  effectSplashTargetColor: {x: 0, y: 0, z: 0, w: 0}
 --- !u!195 &195995870123340446
 NavMeshAgent:
   m_ObjectHideFlags: 1

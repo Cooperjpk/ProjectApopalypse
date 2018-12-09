@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -6,7 +7,6 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class Unit : Entity
 {
-
     //States
     public enum States
     {
@@ -51,6 +51,11 @@ public class Unit : Entity
     public string passive2;
     public string passive3;
     public string passive4;
+
+    public Passive passiveAbility1;
+    public Passive passiveAbility2;
+    public Passive passiveAbility3;
+    public Passive passiveAbility4;
 
     int curBaseDamage;
     public int actBaseDamage;
@@ -161,7 +166,10 @@ public class Unit : Entity
     public bool targetAllies = false;
     public bool targetEnemies = true;
 
+    public PassiveManager passiveManager;
+
     [Header("Particle Effects")]
+    public float effectImpactTime = 1;
     public ParticleSystem effectSplashTarget;
     public Vector4 effectSplashTargetColor;
     //public ParticleSystem effectSplashTargetOrigin;
@@ -259,6 +267,10 @@ public class Unit : Entity
         {
             return States.Death;
         }
+        if (targets[0] == null)
+        {
+            return States.Idle;
+        }
         //If the unit can attack, is in range and is fully charged, then attack.
         else if (canAttack && targets[0].gameObject.activeSelf && curRange >= Vector3.Distance(targets[0].transform.position, transform.position) && chargeStamp <= Time.time)
         {
@@ -293,8 +305,12 @@ public class Unit : Entity
         navMeshAgent.stoppingDistance = stoppingDistance;
 
         //Find the closest target.
-        targets = GetAllEntities(FindObjectsOfType<Entity>());
-        targets.Sort(ByDistance);
+        List<Entity> entities = GetAllEntities(FindObjectsOfType<Entity>());
+        if (entities.Count > 0)
+        {
+            targets = entities;
+            targets.Sort(ByDistance);
+        }
 
         //Invoke the function that runs the behaviour for entering the intial currentState
         Invoke("Enter" + currentState.ToString() + "State", 0);
@@ -310,6 +326,56 @@ public class Unit : Entity
         else
         {
             attackType = AttackType.Ranged;
+        }
+
+        //Add passive componnents based on strings of passive1-4.
+        AddPassiveComponents();
+
+        //Now add all passives to the passive manager.
+        passiveManager = GetComponent<PassiveManager>();
+        if (passiveManager != null)
+        {
+            passiveManager.SetupPassives();
+        }
+        else
+        {
+            Debug.LogError("The passive manager is returning null.");
+        }
+
+        passiveManager.SelfDeploy();
+    }
+
+    void AddPassiveComponents()
+    {
+        if (!string.IsNullOrEmpty(passive1))
+        {
+            //Debug.Log(passive1);
+            Type type = Type.GetType(passive1);
+            passiveAbility1 = gameObject.AddComponent(type) as Passive;
+        }
+
+        if (!string.IsNullOrEmpty(passive2))
+        {
+            //Debug.Log(passive2);
+            Type type = Type.GetType(passive2);
+            gameObject.AddComponent(type);
+            passiveAbility2 = gameObject.AddComponent(type) as Passive;
+        }
+
+        if (!string.IsNullOrEmpty(passive3))
+        {
+            //Debug.Log(passive3);
+            Type type = Type.GetType(passive3);
+            gameObject.AddComponent(type);
+            passiveAbility3 = gameObject.AddComponent(type) as Passive;
+        }
+
+        if (!string.IsNullOrEmpty(passive4))
+        {
+            //Debug.Log(passive4);
+            Type type = Type.GetType(passive4);
+            gameObject.AddComponent(type);
+            passiveAbility4 = gameObject.AddComponent(type) as Passive;
         }
     }
 
@@ -332,6 +398,7 @@ public class Unit : Entity
         //Check if target is null or innactive
         if (!targets[0] || !targets[0].gameObject.activeSelf)
         {
+            passiveManager.SelfTarget();
             targets = GetAllEntities(FindObjectsOfType<Entity>());
         }
     }
@@ -470,6 +537,7 @@ public class Unit : Entity
     void EnterDeathState()
     {
         Debug.Log(gameObject.name + " has died :(");
+        passiveManager.SelfDeath();
         gameObject.SetActive(false);
     }
 
@@ -494,6 +562,8 @@ public class Unit : Entity
 
             //Reset the charge time.
             chargeStamp = Time.time + curChargeTime;
+
+            passiveManager.SelfAttack();
 
             //Invoke the attack at salvoRate, curSalvo number of times.
             for (int i = 0; i < curSalvo; i++)
@@ -575,6 +645,17 @@ public class Unit : Entity
                             for (int i = 0; i < hits.Length; i++)
                             {
                                 hits[i].collider.gameObject.GetComponent<Entity>().ChangeHealth(CalculateDamage(hits[i].collider.gameObject.tag, DamageType.Splash), DamageType.Splash, gameObject.tag);
+                                /*
+                                Entity entity;
+                                if ((entity = hits[i].collider.gameObject.GetComponent<Entity>()) != null)
+                                {
+                                    entity.ChangeHealth(CalculateDamage(entity.tag, DamageType.Splash), DamageType.Splash, gameObject.tag);
+                                }
+                                else
+                                {
+                                    Debug.LogError("The entity hit in the collision returns null.");
+                                }
+                                */
                             }
                         }
                         break;
@@ -588,7 +669,7 @@ public class Unit : Entity
                             origin = transform.position;
 
                             Collider[] selfHits;
-                            selfHits = Physics.OverlapSphere(origin,curSplashRadius);
+                            selfHits = Physics.OverlapSphere(origin, curSplashRadius);
 
                             for (int k = 0; k < selfHits.Length; k++)
                             {
@@ -603,9 +684,9 @@ public class Unit : Entity
                                 origin = targets[j].transform.position;
 
                                 Collider[] targetHits;
-                                targetHits = Physics.OverlapSphere(origin,curSplashRadius);
+                                targetHits = Physics.OverlapSphere(origin, curSplashRadius);
 
-                                for(int l = 0; l < targetHits.Length; l++)
+                                for (int l = 0; l < targetHits.Length; l++)
                                 {
                                     targetHits[l].gameObject.GetComponent<Entity>().ChangeHealth(CalculateDamage(targetHits[l].gameObject.tag, DamageType.Splash), DamageType.Splash, gameObject.tag);
                                     Debug.Log(targetHits[l].gameObject.name + " has been hit for " + CalculateDamage(targetHits[l].gameObject.tag, DamageType.Splash));
@@ -615,7 +696,7 @@ public class Unit : Entity
                                     //emitParams.startColor = effectSplashTargetColor;
                                     //This needs to be in accordance with the actual size of the splash radius.
                                     emitParams.startSize = curSplashRadius;
-                                    effectSplashTarget.Emit(emitParams,1);
+                                    effectSplashTarget.Emit(emitParams, 1);
                                 }
                             }
                         }
