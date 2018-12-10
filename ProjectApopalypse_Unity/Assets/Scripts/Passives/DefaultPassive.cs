@@ -4,6 +4,13 @@ using UnityEngine;
 
 public class DefaultPassive : Passive, ISelfAttack, ISelfDamaged, ISelfDeath, ISelfDeploy, ISelfStatusEffect, ISelfTarget {
 
+    void Awake()
+    {
+        displayName = "Default Passive";
+        description = "The default passive ability.";
+        isLocked = true;
+    }
+
     public void SelfAttack()
     {
         Debug.Log("Self attack triggered.");

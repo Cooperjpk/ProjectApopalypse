@@ -3,10 +3,95 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(NavMeshAgent))]
-public class Unit : Entity
+public class Unit : MonoBehaviour
 {
+    public string displayName;
+    public string technicalName;
+    public GameObject model;
+    public Image icon;
+
+    public string[] classifications;
+    public string description;
+
+    public int powerLevel;
+    public int PowerLevel
+    {
+        get
+        {
+            //Calculate the power level of the unit here.
+            return powerLevel;
+        }
+    }
+
+    public enum Rank
+    {
+        S,
+        A,
+        B,
+        C,
+        D
+    }
+    public Rank rank;
+
+    //Stage.Theme theme;
+
+    Animator animator;
+    Renderer render;
+
+    public string variationName;
+    public Texture variation;
+
+    //Health
+    int curHealth;
+    public int actHealth;
+    public int actHealthMax;
+    public int actHealthMin;
+    public bool actHealthLocked;
+
+    int curBaseArmor;
+    public int actBaseArmor;
+    public int actBaseArmorMax;
+    public int actBaseArmorMin;
+    public bool actBaseArmorLocked;
+
+    int curTroopArmor;
+    public int actTroopArmor;
+    public int actTroopArmorMax;
+    public int actTroopArmorMin;
+    public bool actTroopArmorLocked;
+
+    int curSiegeArmor;
+    public int actSiegeArmor;
+    public int actSiegeArmorMax;
+    public int actSiegeArmorMin;
+    public bool actSiegeArmorLocked;
+
+    int curDirectArmor;
+    public int actDirectArmor;
+    public int actDirectArmorMax;
+    public int actDirectArmorMin;
+    public bool actDirectArmorLocked;
+
+    int curSplashArmor;
+    public int actSplashArmor;
+    public int actSplashArmorMax;
+    public int actSplashArmorMin;
+    public bool actSplashArmorLocked;
+
+    public bool isAlive;
+    public bool isInvincible;
+
+    public enum DamageType
+    {
+        Direct,
+        Splash
+    }
+
+    //Above is all old Entity class stuff
+
     //States
     public enum States
     {
@@ -68,6 +153,12 @@ public class Unit : Entity
     public int actTroopDamageMax;
     public int actTroopDamageMin;
     public bool actTroopDamageLocked;
+
+    int curSiegeDamage;
+    public int actSiegeDamage;
+    public int actSiegeDamageMax;
+    public int actSiegeDamageMin;
+    public bool actSiegeDamageLocked;
 
     int curCoreDamage;
     public int actCoreDamage;
@@ -148,7 +239,7 @@ public class Unit : Entity
     }
     public MoveType moveType;
 
-    public List<Entity> targets = new List<Entity>();
+    public List<Unit> targets = new List<Unit>();
     string priorityTargetTag;
 
     NavMeshAgent navMeshAgent;
@@ -165,6 +256,7 @@ public class Unit : Entity
     //Vector3 attackPosition;
     public bool targetAllies = false;
     public bool targetEnemies = true;
+    string unitTag;
 
     public PassiveManager passiveManager;
 
@@ -290,6 +382,9 @@ public class Unit : Entity
 
     void Start()
     {
+        animator = GetComponent<Animator>();
+        render = GetComponent<Renderer>();
+
         myLayer = gameObject.layer;
         if (myLayer == 8)
         {
@@ -298,17 +393,25 @@ public class Unit : Entity
         else if (myLayer == 9)
         {
             enemyLayer = 8;
+            animator = GetComponent<Animator>();
+            render = GetComponent<Renderer>();
+        }
 
+        //Set your tag
+        if(unitTag != "")
+        {
+            Debug.LogWarning("NEED TO FIX THE LICENSING ISSUE WITH EXCEL TO ADD THIS COLUMN TO THE UNIT SHEET");
+            gameObject.tag = unitTag;
         }
 
         navMeshAgent = GetComponent<NavMeshAgent>();
         navMeshAgent.stoppingDistance = stoppingDistance;
 
         //Find the closest target.
-        List<Entity> entities = GetAllEntities(FindObjectsOfType<Entity>());
-        if (entities.Count > 0)
+        List<Unit> units = GetAllUnits(FindObjectsOfType<Unit>());
+        if (units.Count > 0)
         {
-            targets = entities;
+            targets = units;
             targets.Sort(ByDistance);
         }
 
@@ -399,18 +502,18 @@ public class Unit : Entity
         if (!targets[0] || !targets[0].gameObject.activeSelf)
         {
             passiveManager.SelfTarget();
-            targets = GetAllEntities(FindObjectsOfType<Entity>());
+            targets = GetAllUnits(FindObjectsOfType<Unit>());
         }
     }
 
-    List<Entity> GetAllEntities(Entity[] entities)
+    List<Unit> GetAllUnits(Unit[] units)
     {
-        List<Entity> potentialTargets = new List<Entity>();
-        foreach (Entity entity in entities)
+        List<Unit> potentialTargets = new List<Unit>();
+        foreach (Unit unit in units)
         {
-            if (entity.gameObject.layer != myLayer && entity.gameObject.activeSelf)
+            if (unit.gameObject.layer != myLayer && unit.gameObject.activeSelf)
             {
-                potentialTargets.Add(entity);
+                potentialTargets.Add(unit);
             }
         }
 
@@ -425,14 +528,14 @@ public class Unit : Entity
         }
     }
 
-    List<Entity> GetAllEntitiesInRange(Entity[] entities)
+    List<Unit> GetAllUnitsInRange(Unit[] units)
     {
-        List<Entity> potentialTargets = new List<Entity>();
-        foreach (Entity entity in entities)
+        List<Unit> potentialTargets = new List<Unit>();
+        foreach (Unit unit in units)
         {
-            if (entity.gameObject.layer != myLayer && curRange >= Vector3.Distance(entity.transform.position, transform.position))
+            if (unit.gameObject.layer != myLayer && curRange >= Vector3.Distance(unit.transform.position, transform.position))
             {
-                potentialTargets.Add(entity);
+                potentialTargets.Add(unit);
             }
         }
 
@@ -447,13 +550,12 @@ public class Unit : Entity
         }
     }
 
-    int ByDistance(Entity entityA, Entity entityB)
+    int ByDistance(Unit unitA, Unit unitB)
     {
-        float distanceToA = Vector3.Distance(transform.position, entityA.transform.position);
-        float distanceToB = Vector3.Distance(transform.position, entityB.transform.position);
+        float distanceToA = Vector3.Distance(transform.position, unitA.transform.position);
+        float distanceToB = Vector3.Distance(transform.position, unitB.transform.position);
         return distanceToA.CompareTo(distanceToB);
     }
-
     int ByColliderDistance(Collider colA, Collider colB)
     {
         float distanceToA = Vector3.Distance(transform.position, colA.transform.position);
@@ -461,12 +563,18 @@ public class Unit : Entity
         return distanceToA.CompareTo(distanceToB);
     }
 
-    public override void SetCurrentVariables()
+    public void SetCurrentVariables()
     {
-        base.SetCurrentVariables();
-
+        curHealth = actHealth;
+        curBaseArmor = actBaseArmor;
+        curTroopArmor = actTroopArmor;
+        curSiegeArmor = actSiegeArmor;
+        curDirectArmor = actDirectArmor;
+        curSplashArmor = actSplashArmor;
+        //Above was entitiy work
         curBaseDamage = actBaseDamage;
         curTroopDamage = actTroopDamage;
+        curSiegeDamage = actSiegeDamage;
         curCoreDamage = actCoreDamage;
         curChestDamage = actChestDamage;
         curDirectDamage = actDirectDamage;
@@ -593,16 +701,14 @@ public class Unit : Entity
         }
 
         //If the unit has direct damage, deal that damage to targets[] (curTargets).
-        if (curDirectDamage > 0)
+        for (int i = 0; i < totTargets; i++)
         {
-            for (int i = 0; i < totTargets; i++)
-            {
-                targets[i].ChangeHealth(CalculateDamage(targets[i].gameObject.tag, DamageType.Direct), DamageType.Direct, gameObject.tag);
-            }
+            int calculatedDamage = CalculateDamage(targets[i].gameObject.tag, DamageType.Direct);
+            targets[i].ChangeHealth(calculatedDamage, DamageType.Direct, gameObject.tag);
         }
 
         //If splash, create a raycast line or other shape depending on the mode that was selected.
-        if (curSplashRadius > 0 && curSplashDamage > 0)
+        if (curSplashRadius > 0)
         {
             //Sets the layer mask to only target the layers that enemies or allies are on.
             if (targetAllies && targetEnemies)
@@ -644,18 +750,8 @@ public class Unit : Entity
 
                             for (int i = 0; i < hits.Length; i++)
                             {
-                                hits[i].collider.gameObject.GetComponent<Entity>().ChangeHealth(CalculateDamage(hits[i].collider.gameObject.tag, DamageType.Splash), DamageType.Splash, gameObject.tag);
-                                /*
-                                Entity entity;
-                                if ((entity = hits[i].collider.gameObject.GetComponent<Entity>()) != null)
-                                {
-                                    entity.ChangeHealth(CalculateDamage(entity.tag, DamageType.Splash), DamageType.Splash, gameObject.tag);
-                                }
-                                else
-                                {
-                                    Debug.LogError("The entity hit in the collision returns null.");
-                                }
-                                */
+                                int calculatedDamage = CalculateDamage(hits[i].collider.gameObject.tag, DamageType.Splash);
+                                hits[i].collider.gameObject.GetComponent<Unit>().ChangeHealth(calculatedDamage, DamageType.Splash, gameObject.tag);
                             }
                         }
                         break;
@@ -673,8 +769,9 @@ public class Unit : Entity
 
                             for (int k = 0; k < selfHits.Length; k++)
                             {
-                                selfHits[k].gameObject.GetComponent<Entity>().ChangeHealth(CalculateDamage(selfHits[k].gameObject.tag, DamageType.Splash), DamageType.Splash, gameObject.tag);
-                                Debug.Log(selfHits[k].gameObject.name + " has been hit for " + CalculateDamage(selfHits[k].gameObject.tag, DamageType.Splash));
+                                int calculatedDamage = CalculateDamage(selfHits[k].gameObject.tag, DamageType.Splash);
+                                selfHits[k].gameObject.GetComponent<Unit>().ChangeHealth(calculatedDamage, DamageType.Splash, gameObject.tag);
+                                Debug.Log(selfHits[k].gameObject.name + " has been hit for " + calculatedDamage);
                             }
                         }
                         else if (splashOrigin == SplashOrigin.Targets)
@@ -688,8 +785,9 @@ public class Unit : Entity
 
                                 for (int l = 0; l < targetHits.Length; l++)
                                 {
-                                    targetHits[l].gameObject.GetComponent<Entity>().ChangeHealth(CalculateDamage(targetHits[l].gameObject.tag, DamageType.Splash), DamageType.Splash, gameObject.tag);
-                                    Debug.Log(targetHits[l].gameObject.name + " has been hit for " + CalculateDamage(targetHits[l].gameObject.tag, DamageType.Splash));
+                                    int calculatedDamage = CalculateDamage(targetHits[l].gameObject.tag, DamageType.Splash);
+                                    targetHits[l].gameObject.GetComponent<Unit>().ChangeHealth(calculatedDamage, DamageType.Splash, gameObject.tag);
+                                    Debug.Log(targetHits[l].gameObject.name + " has been hit for " + calculatedDamage);
                                     //Splash Particle Effect Targets Origin
                                     var emitParams = new ParticleSystem.EmitParams();
                                     //This needs to be from a data entry in the sheet that takes in 3 values (I'm thinking RGB).
@@ -713,31 +811,47 @@ public class Unit : Entity
         totTargets = 1;
     }
 
-    public int CalculateDamage(string damageDealer, DamageType damageType)
+    string GetUnitType()
     {
-        int damage = 0;
-        int damageFraction = 0;
+        if(!canMove)
+        {
+            return "Siege";
+        }
+        else
+        {
+            return "Troop";
+        }
+    }
 
-        switch (damageDealer)
+    public int CalculateDamage(string targetTag, DamageType damageType)
+    {
+        int bonusDamage = 0;
+
+        switch (targetTag)
         {
             default:
                 {
-                    Debug.Log("damageDealer string was not a recognizable string.");
+                    Debug.Log("targetTag "+ targetTag + " was not a recognizable tag.");
                     break;
                 }
             case "Troop":
                 {
-                    damageFraction += curTroopDamage;
+                    bonusDamage += curTroopDamage;
+                    break;
+                }
+            case "Siege":
+                {
+                    bonusDamage += curSiegeDamage;
                     break;
                 }
             case "Core":
                 {
-                    damageFraction += curCoreDamage;
+                    bonusDamage += curCoreDamage;
                     break;
                 }
             case "Chest":
                 {
-                    damageFraction += curChestDamage;
+                    bonusDamage += curChestDamage;
                     break;
                 }
         }
@@ -751,24 +865,105 @@ public class Unit : Entity
                 }
             case DamageType.Direct:
                 {
-                    damageFraction += curDirectDamage;
+                    bonusDamage += curDirectDamage;
                     break;
                 }
             case DamageType.Splash:
                 {
-                    damageFraction += curSplashDamage;
+                    bonusDamage += curSplashDamage;
                     break;
                 }
         }
 
-        float accumulative = damage + damageFraction;
+        float accumulative = curBaseDamage + bonusDamage;
+        float finalDamage = accumulative;
+
+        //Debug.Log("Final damage is " + finalDamage);
+        return Mathf.RoundToInt(finalDamage);
+    }
+
+    public void ChangeHealth(int damage)
+    {
+        curHealth -= damage;
+
+        if (curHealth <= 0)
+        {
+            curHealth = 0;
+            isAlive = false;
+        }
+        else if (curHealth >= actHealth)
+        {
+            curHealth = actHealth;
+        }
+
+        passiveManager.SelfDamaged();
+    }
+
+    public void ChangeHealth(int damage, DamageType damageType, string damageSource)
+    {
+        int bonusArmor = 0;
+
+        switch (damageType)
+        {
+            case DamageType.Direct:
+                {
+                    //Debug.Log("Direct damage being dealt.");
+                    bonusArmor += curDirectArmor;
+                    break;
+                }
+            case DamageType.Splash:
+                {
+                    //Debug.Log("Splash damage being dealt.");
+                    bonusArmor += curSplashArmor;
+                    break;
+                }
+        }
+
+        switch (damageSource)
+        {
+            default:
+                {
+                    Debug.LogWarning("The damageSource did not have a recorded tag");
+                    break;
+                }
+            case "Troop":
+                {
+                    //Debug.Log("Troop damage being dealt.");
+                    bonusArmor += curTroopArmor;
+                    break;
+                }
+            case "Siege":
+                {
+                    //Debug.Log("Troop damage being dealt.");
+                    bonusArmor += curSiegeArmor;
+                    break;
+                }
+        }
+
+        //Debug.Log("Bonus armor is " + bonusArmor);
+        float accumulative = damage + bonusArmor + curBaseArmor;
         float damageMultiplier = damage / accumulative;
-        damageMultiplier += 1;
         float finalDamage = damage * damageMultiplier;
 
-        Debug.Log(finalDamage);
-        //For some reason damage is ending up being 0 when base damage is 1 and splash damage is 1 and everything else is 0.
+        if(finalDamage < 1)
+        {
+            //Debug.Log("Damage was 0, changed to 1.");
+            finalDamage = 1;
+        }
 
-        return Mathf.RoundToInt(finalDamage);
+        //Debug.Log("Final damage is " + Mathf.RoundToInt(finalDamage));
+        curHealth -= Mathf.RoundToInt(finalDamage);
+
+        if (curHealth <= 0)
+        {
+            curHealth = 0;
+            isAlive = false;
+        }
+        else if (curHealth >= actHealth)
+        {
+            curHealth = actHealth;
+        }
+
+        passiveManager.SelfDamaged();
     }
 }

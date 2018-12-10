@@ -19,9 +19,6 @@ public class DataReader : MonoBehaviour
     {
         ReadFile("Units");
         InstantiateUnit("defaultSplashUnit", transform.position, transform.rotation);
-        InstantiateUnit("defaultSplashUnit", transform.position, transform.rotation);
-        InstantiateUnit("defaultSplashUnit", transform.position, transform.rotation);
-
     }
 
     void InstantiateUnit(string instanceName, Vector3 spawnLocation, Quaternion spawnRotation)
