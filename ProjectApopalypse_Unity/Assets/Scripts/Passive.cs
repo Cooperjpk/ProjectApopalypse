@@ -7,6 +7,7 @@ public class Passive : MonoBehaviour {
     public string displayName;
     public string description;
     public bool isLocked = false;
+    public bool isHidden = false;
 }
 
 public interface ISelfDeploy
