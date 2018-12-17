@@ -44,38 +44,40 @@ public class Unit : MonoBehaviour
     public string variationName;
     public Texture variation;
 
+    //FOR TESTING PURPOSES, ALL CUR VARIABLES HACE BEEN SET TO PUBLIC BUT SHOULD BE CHANGED BACK TO PRIVATE LATER!!!
+
     //Health
-    int curHealth;
+    public int curHealth;
     public int actHealth;
     public int actHealthMax;
     public int actHealthMin;
     public bool actHealthLocked;
 
-    int curBaseArmor;
+    public int curBaseArmor;
     public int actBaseArmor;
     public int actBaseArmorMax;
     public int actBaseArmorMin;
     public bool actBaseArmorLocked;
 
-    int curTroopArmor;
+    public int curTroopArmor;
     public int actTroopArmor;
     public int actTroopArmorMax;
     public int actTroopArmorMin;
     public bool actTroopArmorLocked;
 
-    int curSiegeArmor;
+    public int curSiegeArmor;
     public int actSiegeArmor;
     public int actSiegeArmorMax;
     public int actSiegeArmorMin;
     public bool actSiegeArmorLocked;
 
-    int curDirectArmor;
+    public int curDirectArmor;
     public int actDirectArmor;
     public int actDirectArmorMax;
     public int actDirectArmorMin;
     public bool actDirectArmorLocked;
 
-    int curSplashArmor;
+    public int curSplashArmor;
     public int actSplashArmor;
     public int actSplashArmorMax;
     public int actSplashArmorMin;
@@ -142,91 +144,91 @@ public class Unit : MonoBehaviour
     public Passive passiveAbility3;
     public Passive passiveAbility4;
 
-    int curBaseDamage;
+    public int curBaseDamage;
     public int actBaseDamage;
     public int actBaseDamageMax;
     public int actBaseDamageMin;
     public bool actBaseDamageLocked;
 
-    int curTroopDamage;
+    public int curTroopDamage;
     public int actTroopDamage;
     public int actTroopDamageMax;
     public int actTroopDamageMin;
     public bool actTroopDamageLocked;
 
-    int curSiegeDamage;
+    public int curSiegeDamage;
     public int actSiegeDamage;
     public int actSiegeDamageMax;
     public int actSiegeDamageMin;
     public bool actSiegeDamageLocked;
 
-    int curCoreDamage;
+    public int curCoreDamage;
     public int actCoreDamage;
     public int actCoreDamageMax;
     public int actCoreDamageMin;
     public bool actCoreDamageLocked;
 
-    int curChestDamage;
+    public int curChestDamage;
     public int actChestDamage;
     public int actChestDamageMax;
     public int actChestDamageMin;
     public bool actChestDamageLocked;
 
-    int curDirectDamage;
+    public int curDirectDamage;
     public int actDirectDamage;
     public int actDirectDamageMax;
     public int actDirectDamageMin;
     public bool actDirectDamageLocked;
 
-    int curSplashDamage;
+    public int curSplashDamage;
     public int actSplashDamage;
     public int actSplashDamageMax;
     public int actSplashDamageMin;
     public bool actSplashDamageLocked;
 
-    float curCooldown;
+    public float curCooldown;
     public float actCooldown;
     public float actCooldownMax;
     public float actCooldownMin;
     public bool actCooldownLocked;
 
-    float curChargeTime;
+    public float curChargeTime;
     public float actChargeTime;
     public float actChargeTimeMax;
     public float actChargeTimeMin;
     public bool actChargeTimeLocked;
 
-    float curSplashRadius;
+    public float curSplashRadius;
     public float actSplashRadius;
     public float actSplashRadiusMax;
     public float actSplashRadiusMin;
     public bool actSplashRadiusLocked;
 
-    float curRange;
+    public float curRange;
     public float actRange;
     public float actRangeMax;
     public float actRangeMin;
     public bool actRangeLocked;
 
-    float curMoveSpeed;
+    public float curMoveSpeed;
     public float actMoveSpeed;
     public float actMoveSpeedMax;
     public float actMoveSpeedMin;
     public bool actMoveSpeedLocked;
 
-    int curCharges;
+    public int curCharges;
     public int actCharges;
     public int actChargesMax;
     public int actChargesMin;
     public bool actChargesLocked;
 
-    int curSalvo;
+    public int curSalvo;
     public int actSalvo;
     public int actSalvoMax;
     public int actSalvoMin;
     public bool actSalvoLocked;
 
-    int curTargets;
+    public int curTargets;
     public int actTargets;
     public int actTargetsMax;
     public int actTargetsMin;
@@ -248,6 +250,12 @@ public class Unit : MonoBehaviour
     int directDamage;
     int totTargets = 1;
 
+    public float damageDelay;
+
+    //VARIABLES FOR A SCALING SPLASH DAMAGE SYSTEM, THIS WILL ADD NEEDED COMPLEXITY TO THE UNITS
+    public bool degradingSplashDamage = false;
+    public float peakDamagePercent = 1;
+
     int myLayer;
     int enemyLayer;
     LayerMask layerMask;
@@ -265,6 +273,10 @@ public class Unit : MonoBehaviour
     public ParticleSystem effectSplashTarget;
     public Vector4 effectSplashTargetColor;
     //public ParticleSystem effectSplashTargetOrigin;
+
+    //Damage Flashing
+    Color damageColor = new Color(255, 0, 0, 0);
+    float flashTime = 0.1f;
 
     //Splash Particle Effect Targets Origin
 
@@ -393,14 +405,12 @@ public class Unit : MonoBehaviour
         else if (myLayer == 9)
         {
             enemyLayer = 8;
-            animator = GetComponent<Animator>();
-            render = GetComponent<Renderer>();
         }
 
         //Set your tag
-        if(unitTag != "")
+        if (!String.IsNullOrEmpty(unitTag))
         {
-            Debug.LogWarning("NEED TO FIX THE LICENSING ISSUE WITH EXCEL TO ADD THIS COLUMN TO THE UNIT SHEET");
+            //NEED TO ADD THIS TO THE EXCEL SHEET WHEN ITS NOT BROKEN
             gameObject.tag = unitTag;
         }
 
@@ -673,17 +683,14 @@ public class Unit : MonoBehaviour
 
             passiveManager.SelfAttack();
 
-            //Invoke the attack at salvoRate, curSalvo number of times.
-            for (int i = 0; i < curSalvo; i++)
-            {
-                //Debug.Log("Attack happening");
-                Invoke("AttackFunctionality", i * salvoRate);
-            }
+            StartCoroutine(DamageDelay(damageDelay));
         }
     }
 
     public void AttackFunctionality()
     {
+        Debug.Log("Attack happening");
+
         //Find out how many targets to apply the attack to.
         if (curTargets <= targets.Count)
         {
@@ -725,19 +732,19 @@ public class Unit : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("There was a problem assembling the layer mask because allies and enemies were both not targetted.");
+                Debug.LogError("There was a problem assembling the layer mask because allies and enemies were both not targetted.");
             }
 
             switch (splashType)
             {
                 default:
                     {
-                        Debug.LogWarning("The splash type has not been specified.");
+                        Debug.LogError("The splash type has not been specified.");
                         break;
                     }
                 case (SplashType.Line):
                     {
-                        Debug.Log("Line splash.");
+                        //Debug.Log("Line splash.");
                         for (int j = 0; j < totTargets; j++)
                         {
                             var heading = targets[j].transform.position - transform.position;
@@ -745,8 +752,8 @@ public class Unit : MonoBehaviour
                             var direction = heading / distance;
 
                             RaycastHit[] hits;
-                            hits = Physics.RaycastAll(transform.position, direction, maxLineDistance, layerMask);
-                            Debug.DrawRay(transform.position, direction * maxLineDistance, Color.green);
+                            hits = Physics.RaycastAll(transform.position, direction, curSplashRadius, layerMask);
+                            Debug.DrawRay(transform.position, direction * curSplashRadius, Color.green);
 
                             for (int i = 0; i < hits.Length; i++)
                             {
@@ -758,20 +765,19 @@ public class Unit : MonoBehaviour
                     }
                 case (SplashType.Sphere):
                     {
-                        Debug.Log("Sphere splash.");
                         Vector3 origin;
                         if (splashOrigin == SplashOrigin.Self)
                         {
                             origin = transform.position;
 
                             Collider[] selfHits;
-                            selfHits = Physics.OverlapSphere(origin, curSplashRadius);
+                            selfHits = Physics.OverlapSphere(origin, curSplashRadius, layerMask);
 
                             for (int k = 0; k < selfHits.Length; k++)
                             {
                                 int calculatedDamage = CalculateDamage(selfHits[k].gameObject.tag, DamageType.Splash);
                                 selfHits[k].gameObject.GetComponent<Unit>().ChangeHealth(calculatedDamage, DamageType.Splash, gameObject.tag);
-                                Debug.Log(selfHits[k].gameObject.name + " has been hit for " + calculatedDamage);
+                                //Debug.Log(selfHits[k].gameObject.name + " has been hit for " + calculatedDamage);
                             }
                         }
                         else if (splashOrigin == SplashOrigin.Targets)
@@ -781,20 +787,21 @@ public class Unit : MonoBehaviour
                                 origin = targets[j].transform.position;
 
                                 Collider[] targetHits;
-                                targetHits = Physics.OverlapSphere(origin, curSplashRadius);
+                                targetHits = Physics.OverlapSphere(origin, curSplashRadius, layerMask);
 
                                 for (int l = 0; l < targetHits.Length; l++)
                                 {
                                     int calculatedDamage = CalculateDamage(targetHits[l].gameObject.tag, DamageType.Splash);
                                     targetHits[l].gameObject.GetComponent<Unit>().ChangeHealth(calculatedDamage, DamageType.Splash, gameObject.tag);
                                     Debug.Log(targetHits[l].gameObject.name + " has been hit for " + calculatedDamage);
+
                                     //Splash Particle Effect Targets Origin
-                                    var emitParams = new ParticleSystem.EmitParams();
+                                    //var emitParams = new ParticleSystem.EmitParams();
                                     //This needs to be from a data entry in the sheet that takes in 3 values (I'm thinking RGB).
                                     //emitParams.startColor = effectSplashTargetColor;
                                     //This needs to be in accordance with the actual size of the splash radius.
-                                    emitParams.startSize = curSplashRadius;
-                                    effectSplashTarget.Emit(emitParams, 1);
+                                    //emitParams.startSize = curSplashRadius;
+                                    //effectSplashTarget.Emit(emitParams, 1);
                                 }
                             }
                         }
@@ -811,9 +818,29 @@ public class Unit : MonoBehaviour
         totTargets = 1;
     }
 
+    void OnDrawGizmosSelected()
+    {
+        if (curSplashRadius > 0 && splashType == SplashType.Sphere)
+        {
+            Gizmos.color = Color.green;
+            if (splashOrigin == SplashOrigin.Self)
+            {
+                Gizmos.DrawWireSphere(transform.position, curSplashRadius);
+            }
+            else
+            {
+                for (int t = 0; t < totTargets; t++)
+                {
+                    Gizmos.DrawWireSphere(targets[t].transform.position, curSplashRadius);
+                }
+            }
+        }
+
+    }
+
     string GetUnitType()
     {
-        if(!canMove)
+        if (!canMove)
         {
             return "Siege";
         }
@@ -831,7 +858,7 @@ public class Unit : MonoBehaviour
         {
             default:
                 {
-                    Debug.Log("targetTag "+ targetTag + " was not a recognizable tag.");
+                    Debug.Log("targetTag " + targetTag + " was not a recognizable tag.");
                     break;
                 }
             case "Troop":
@@ -945,7 +972,7 @@ public class Unit : MonoBehaviour
         float damageMultiplier = damage / accumulative;
         float finalDamage = damage * damageMultiplier;
 
-        if(finalDamage < 1)
+        if (finalDamage < 1)
         {
             //Debug.Log("Damage was 0, changed to 1.");
             finalDamage = 1;
@@ -965,5 +992,29 @@ public class Unit : MonoBehaviour
         }
 
         passiveManager.SelfDamaged();
+
+        //Flash unit color to signify damage being dealt.
+        StartCoroutine(DamageFlash());
+    }
+
+    IEnumerator DamageFlash()
+    {
+        Color regularColor = render.material.color;
+        render.material.color = damageColor;
+        yield return new WaitForSeconds(flashTime);
+        //renderer.material.color = regularColor;
+        render.material.color = Color.white;
+    }
+
+    IEnumerator DamageDelay(float damageDelay)
+    {
+        yield return new WaitForSeconds(damageDelay);
+        AttackFunctionality();
+
+        //Invoke the attack at salvoRate, curSalvo number of times.
+        for (int i = 1; i < curSalvo; i++)
+        {
+            Invoke("AttackFunctionality", i * salvoRate);
+        }
     }
 }
