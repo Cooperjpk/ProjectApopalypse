@@ -266,7 +266,25 @@ public class Unit : MonoBehaviour
     public bool targetEnemies = true;
     string unitTag;
 
+    //Passives
     public PassiveManager passiveManager;
+
+    public delegate void DeployAction();
+    public event DeployAction deployAction;
+
+    public delegate void TargetAction();
+    public event TargetAction targetAction;
+
+    public delegate void AttackAction();
+    public event AttackAction attackAction;
+
+    public delegate void DamagedAction();
+    public event DamagedAction damagedAction;
+
+    public delegate void DeathAction();
+    public event DeathAction deathAction;
+
+    //public delegate void 
 
     [Header("Particle Effects")]
     public float effectImpactTime = 1;
@@ -444,18 +462,15 @@ public class Unit : MonoBehaviour
         //Add passive componnents based on strings of passive1-4.
         AddPassiveComponents();
 
-        //Now add all passives to the passive manager.
-        passiveManager = GetComponent<PassiveManager>();
-        if (passiveManager != null)
+        //passiveManager.SelfDeploy();
+        if (deployAction != null)
         {
-            passiveManager.SetupPassives();
+            deployAction();
         }
         else
         {
-            Debug.LogError("The passive manager is returning null.");
+            Debug.LogError("Deploy Action returns null.");
         }
-
-        passiveManager.SelfDeploy();
     }
 
     void AddPassiveComponents()
@@ -511,7 +526,16 @@ public class Unit : MonoBehaviour
         //Check if target is null or innactive
         if (!targets[0] || !targets[0].gameObject.activeSelf)
         {
-            passiveManager.SelfTarget();
+            //passiveManager.SelfTarget();
+            if (targetAction != null)
+            {
+                targetAction();
+            }
+            else
+            {
+                Debug.LogError("Target Action returns null.");
+            }
+
             targets = GetAllUnits(FindObjectsOfType<Unit>());
         }
     }
@@ -655,7 +679,17 @@ public class Unit : MonoBehaviour
     void EnterDeathState()
     {
         Debug.Log(gameObject.name + " has died :(");
-        passiveManager.SelfDeath();
+
+        //passiveManager.SelfDeath();
+        if(deathAction != null)
+        {
+            deathAction();
+        }
+        else
+        {
+            Debug.LogError("Death action is null");
+        }
+
         gameObject.SetActive(false);
     }
 
@@ -681,15 +715,21 @@ public class Unit : MonoBehaviour
             //Reset the charge time.
             chargeStamp = Time.time + curChargeTime;
 
-            passiveManager.SelfAttack();
-
             StartCoroutine(DamageDelay(damageDelay));
         }
     }
 
     public void AttackFunctionality()
     {
-        Debug.Log("Attack happening");
+        //Trigger attack action.
+        if (attackAction != null)
+        {
+            attackAction();
+        }
+        else
+        {
+            Debug.LogError("Attack action is null.");
+        }
 
         //Find out how many targets to apply the attack to.
         if (curTargets <= targets.Count)
@@ -923,7 +963,16 @@ public class Unit : MonoBehaviour
             curHealth = actHealth;
         }
 
-        passiveManager.SelfDamaged();
+        //passiveManager.SelfDamaged();
+        if(damagedAction != null)
+        {
+            damagedAction();
+        }
+        else
+        {
+            Debug.LogError("Damaged action is null.");
+        }
+
     }
 
     public void ChangeHealth(int damage, DamageType damageType, string damageSource)
@@ -991,7 +1040,15 @@ public class Unit : MonoBehaviour
             curHealth = actHealth;
         }
 
-        passiveManager.SelfDamaged();
+        //passiveManager.SelfDamaged();
+        if (damagedAction != null)
+        {
+            damagedAction();
+        }
+        else
+        {
+            Debug.LogError("Damaged action is null.");
+        }
 
         //Flash unit color to signify damage being dealt.
         StartCoroutine(DamageFlash());

@@ -9,11 +9,13 @@ public class DefaultPassive : Passive, ISelfAttack, ISelfDamaged, ISelfDeath, IS
         displayName = "Default Passive";
         description = "The default passive ability.";
         isLocked = true;
+        isHidden = false;
     }
 
     public void SelfAttack()
     {
-        //Debug.Log("Self attack triggered.");
+        //NOT TRIGGERING
+        Debug.Log("Self attack triggered.");
     }
 
     public void SelfDamaged()

@@ -7,11 +7,36 @@ public class PassiveManager : MonoBehaviour {
     public List<Passive> passives = new List<Passive>();
 
     Unit unit;
+    Unit target;
+    Unit[] allies;
+    Unit[] enemies;
 
-    public void SetupPassives()
+    void OnEnable()
     {
         unit = GetComponent<Unit>();
 
+        //Setup the allies and enemies array.
+        //Get all gameobjects that are not this instance, are in ally layer and are enabled.
+        //Get all gameobjects that are not this instance, are in enemy layer and are enabled.
+
+        EnableSelf();
+        EnableTarget();
+        EnableAllies();
+        EnableEnemies();
+
+        SetupPassives();
+    }
+
+    void OnDisable()
+    {
+        DisableSelf();
+        DisableTarget();
+        DisableAllies();
+        DisableEnemies();
+    }
+
+    public void SetupPassives()
+    {
         if(unit.passiveAbility1 != null)
         {
             passives.Add(unit.passiveAbility1);
@@ -30,6 +55,54 @@ public class PassiveManager : MonoBehaviour {
         }
     }
 
+    void EnableSelf()
+    {
+        unit.deployAction += SelfDeploy;
+        unit.damagedAction += SelfDamaged;
+        unit.attackAction += SelfAttack;
+        unit.targetAction += SelfTarget;
+        unit.deathAction += SelfDeath;
+    }
+
+    void DisableSelf()
+    {
+        unit.deployAction -= SelfDeploy;
+        unit.damagedAction -= SelfDamaged;
+        unit.attackAction -= SelfAttack;
+        unit.targetAction -= SelfTarget;
+        unit.deathAction -= SelfDeath;
+    }
+
+    void EnableTarget()
+    {
+
+    }
+
+    void DisableTarget()
+    {
+
+    }
+
+    void EnableAllies()
+    {
+
+    }
+
+    void DisableAllies()
+    {
+
+    }
+
+    void EnableEnemies()
+    {
+
+    }
+
+    void DisableEnemies()
+    {
+
+    }
+
     public void SelfAttack()
     {
         //Debug.Log("Self attack triggered in manager.");
@@ -38,7 +111,8 @@ public class PassiveManager : MonoBehaviour {
             ISelfAttack selfAttack = passives[i] as ISelfAttack;
             if (selfAttack != null)
             {
-                //Debug.Log(passives[i].name + " implements ISelfAttack.");
+                //NOTE: RIGHT NOW THIS IS NOT TRIGGERING BUT IT SHOULD BE, I HAVE NARROWED IT DOWN TO NOT TRIGGERING RIGHT HERE BUT THE ABOVE DEBUG IS TRIGGERING.
+                Debug.Log(passives[i].name + " implements ISelfAttack.");
                 selfAttack.SelfAttack();   
             }
         }
